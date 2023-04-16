@@ -1,8 +1,8 @@
 const http = require('http');
 const {chromium} = require('playwright');
 
-const port = process.env.PORT || 3000;
-const wsPort = process.env.WS_PORT || 4444;
+const port = 3000;
+const wsPort = 4444;
 
 function generateRandomString(length) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -25,7 +25,7 @@ async function launchBrowserServer() {
 }
 
 const server = http.createServer(async (req, res) => {
-  if (req.url === '/v1/launch') {
+  if (req.url === '/launch') {
     const wsPath = await launchBrowserServer();
 
     res.writeHead(200, {

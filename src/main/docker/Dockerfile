@@ -1,14 +1,19 @@
-FROM mcr.microsoft.com/playwright:focal
+ARG PLAYWRIGHT_VERSION=1.32
+
+FROM mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}.0-focal
 
 WORKDIR /app
 
-COPY package.json ./
+RUN chown pwuser:pwuser /app
 
-ARG PLAYWRIGHT_VERSION=1.32.0
+USER pwuser
+
+COPY --chown=pwuser:pwuser package.json ./
 
 RUN npm i playwright@${PLAYWRIGHT_VERSION}
 
-COPY app.js .
+RUN echo "console.log('This image is not intended to be ran without Testcontainers. Refer to documentation in https://github.com/orange-buffalo/testcontainers-playwright');" >> app.js && \
+    echo "${PLAYWRIGHT_VERSION}" >> version.txt
 
 EXPOSE 3000
 EXPOSE 4444

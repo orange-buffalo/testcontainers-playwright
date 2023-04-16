@@ -6,7 +6,10 @@ import com.microsoft.playwright.PlaywrightException
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.testcontainers.containers.GenericContainer
+import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy
 import org.testcontainers.utility.DockerImageName
+import org.testcontainers.utility.MountableFile
+import java.lang.Exception
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -16,7 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 private val log = mu.KotlinLogging.logger {}
 
 class PlaywrightContainer(private val customImage: DockerImageName? = null) :
-    GenericContainer<PlaywrightContainer>(DockerImageName.parse("mcr.microsoft.com/playwright:focal")) {
+    GenericContainer<PlaywrightContainer>(DockerImageName.parse("ghcr.io/orange-buffalo/testcontainers-playwright:1.31")) {
 
     private val playwrightVersion = getPlaywrightVersionOnClasspath()
     private val playwrightVersionCompatibleTag = playwrightVersion?.split(".")?.let { parts ->
@@ -28,7 +31,7 @@ class PlaywrightContainer(private val customImage: DockerImageName? = null) :
     }
     private val playwrightInstances = CopyOnWriteArrayList<Playwright>()
 
-    init {
+    override fun configure() {
         if (playwrightVersion == null && customImage == null) {
             throw IllegalArgumentException(
                 "Playwright version could not be detected on classpath " +
@@ -38,21 +41,36 @@ class PlaywrightContainer(private val customImage: DockerImageName? = null) :
             )
         }
 
-        if (customImage != null
-            && playwrightVersionCompatibleTag != null
-            && customImage.versionPart != playwrightVersionCompatibleTag
-        ) {
-            log.warn {
-                "Playwright version detected on classpath ($playwrightVersion) is not compatible with " +
-                        "the provided image ($customImage). This might lead to unexpected results, for instance" +
-                        "browser being started locally instead of in container."
-            }
+        withCopyToContainer(MountableFile.forClasspathResource("app.js"), "/app/app.js")
+
+        if (customImage == null) {
+            log.info { "Will use Playwright image $playwrightVersionCompatibleTag for version $playwrightVersion found on classpath" }
+            super.setDockerImageName("ghcr.io/orange-buffalo/testcontainers-playwright:$playwrightVersionCompatibleTag")
         }
+
+        withExposedPorts(3000, 4444)
+        waitingFor(LogMessageWaitStrategy().withRegEx("Server running at .*"))
     }
 
-    override fun configure() {
-        withExposedPorts(4444)
-        withExposedPorts(3000)
+    override fun start() {
+        super.start()
+
+        val versionInContainer = try {
+            copyFileFromContainer("/app/version.txt") { stream ->
+                stream.reader().toString()
+            }
+        } catch (e: Exception) {
+            log.warn(e) { "Failed to determine Playwright version in container" }
+            null
+        }
+
+        if (customImage != null && versionInContainer != playwrightVersionCompatibleTag) {
+            log.warn {
+                "Playwright version in container ($versionInContainer) is not compatible with " +
+                        "Playwright on the classpath ($playwrightVersion). This might lead to unexpected results, " +
+                        "for instance browser being started locally instead of in container."
+            }
+        }
     }
 
     fun registerNewBrowser(): Browser {
@@ -78,11 +96,18 @@ class PlaywrightContainer(private val customImage: DockerImageName? = null) :
 
         val httpClient = HttpClient.newHttpClient()
         val request = HttpRequest.newBuilder()
-            .uri(URI.create("http://${host}:${getMappedPort(3000)}/v1/launch"))
+            .uri(URI.create("http://${host}:${getMappedPort(3000)}/launch"))
             .POST(HttpRequest.BodyPublishers.noBody())
             .build()
 
         val response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).get()
+        if (response.statusCode() != 200) {
+            throw IllegalStateException(
+                "Failed to launch browser in container: ${response.statusCode()} / ${
+                    response.headers().map()
+                } / [${response.body()}]"
+            )
+        }
         val responseBody = response.body()
         log.debug { "Got response from the container: $responseBody" }
 

@@ -8,5 +8,6 @@ curl -s "https://repo1.maven.org/maven2/com/microsoft/playwright/playwright/mave
           echo "Building $version"
           docker build -t ghcr.io/orange-buffalo/testcontainers-playwright:$version --build-arg PLAYWRIGHT_VERSION=$version src/main/docker
           docker push ghcr.io/orange-buffalo/testcontainers-playwright:$version
-          echo "$version built \n"
+          echo "$version built"
+          echo ""
         done

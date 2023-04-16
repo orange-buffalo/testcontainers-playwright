@@ -17,8 +17,14 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
     compileOnly("com.microsoft.playwright:playwright:1.32.0")
+    compileOnly("org.junit.jupiter:junit-jupiter-api:5.9.2")
 
     testImplementation(kotlin("test"))
+    testImplementation("io.kotest:kotest-assertions-core:4.0.7")
+    testImplementation("com.microsoft.playwright:playwright:1.32.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+
+    testRuntimeOnly("ch.qos.logback:logback-classic:1.4.6")
 }
 
 tasks.test {
