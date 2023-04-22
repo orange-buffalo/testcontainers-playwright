@@ -1,8 +1,10 @@
 const http = require('http');
-const {chromium} = require('playwright');
+const {chromium, firefox, webkit} = require('playwright');
 
-const port = 3000;
-const wsPort = 4444;
+const apiPort = 3000;
+
+// to prevent garbage collection
+const browsers = [];
 
 function generateRandomString(length) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -13,32 +15,64 @@ function generateRandomString(length) {
   return result;
 }
 
-async function launchBrowserServer() {
+async function launchBrowserServer(request) {
+  console.info('Launching browser with settings', request);
+
   const wsPath = generateRandomString(20);
-  const browserServer = await chromium.launchServer({
-    port: wsPort,
+  const config = {
+    port: request.port,
     wsPath: wsPath,
-  });
+  }
+  let browserType;
+  if (request.browser === 'CHROMIUM') {
+    browserType = chromium;
+    console.info('Will start Chromium')
+  } else if (request.browser === 'FIREFOX') {
+    browserType = firefox;
+    console.info('Will start Firefox')
+  } else if (request.browser === 'WEBKIT') {
+    browserType = webkit;
+    console.info('Will start Webkit')
+  } else {
+    throw new Error(`Unknown browser: ${request.browser}`);
+  }
+  const browserServer = await browserType.launchServer(config);
+  browsers.push(browserServer);
   const wsEndpoint = browserServer.wsEndpoint();
-  console.log(`Browser WebSocket Endpoint (internal): ${wsEndpoint}`);
+  console.info(`Browser WebSocket Endpoint (internal): ${wsEndpoint}`);
   return wsPath;
 }
 
 const server = http.createServer(async (req, res) => {
   if (req.url === '/launch') {
-    const wsPath = await launchBrowserServer();
+    let data = '';
+    for await (const chunk of req) {
+      data += chunk;
+    }
+    console.debug(`Received request to launch browser: ${data}`);
+    const body = JSON.parse(data)
 
-    res.writeHead(200, {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    });
-    res.end(JSON.stringify({wsPath: wsPath}));
+    try {
+      const wsPath = await launchBrowserServer(body);
+
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      });
+      res.end(JSON.stringify({wsPath: wsPath}));
+    } catch (e) {
+      console.error(e);
+      res.writeHead(500);
+      res.end();
+    }
   } else {
+    console.info(`Unknown request: ${req.url}`)
+
     res.writeHead(404);
     res.end();
   }
 });
 
-server.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/`);
+server.listen(apiPort, () => {
+  console.info(`Server running at http://localhost:${apiPort}/`);
 });

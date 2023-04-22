@@ -1,18 +1,38 @@
 package io.orangebuffalo.testcontainers.playwright
 
-import io.kotest.matchers.string.shouldContain
+import mu.KotlinLogging
 import kotlin.test.Test
+
+var log = KotlinLogging.logger {}
 
 internal class PlaywrightContainerImperativeTest {
 
     @Test
-    fun shouldProvideValidBrowser() {
+    fun shouldProvideValidChromiumBrowser() = withContainer {
+        val playwright = registerNewPlaywright()
+        val page = playwright.chromium().openAndVerifyTestPage()
+        page.shouldRunInChromium()
+    }
+
+    @Test
+    fun shouldProvideValidFirefoxBrowser() = withContainer {
+        val playwright = registerNewPlaywright()
+        val page = playwright.firefox().openAndVerifyTestPage()
+        page.shouldRunInFirefox()
+    }
+
+    @Test
+    fun shouldProvideValidWebkitBrowser() = withContainer {
+        val playwright = registerNewPlaywright()
+        val page = playwright.webkit().openAndVerifyTestPage()
+        page.shouldRunInWebkit()
+    }
+
+    private fun withContainer(block: PlaywrightContainer.() -> Unit) {
         PlaywrightContainer().use { container ->
+            container.logConsumers.add { log.info { "[CONTAINER] ${it.utf8String}" } }
             container.start()
-            val browser = container.registerNewBrowser()
-            val page = browser.newPage()
-            page.navigate("https://github.com/microsoft/playwright")
-            page.title().shouldContain("Playwright")
+            block(container)
         }
     }
 }
