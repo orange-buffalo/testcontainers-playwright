@@ -1,6 +1,7 @@
 package io.orangebuffalo.testcontainers.playwright
 
 import com.microsoft.playwright.BrowserContext
+import com.microsoft.playwright.Page
 import io.orangebuffalo.testcontainers.playwright.junit.PlaywrightTestcontainersExtension
 import io.orangebuffalo.testcontainers.playwright.junit.RequiresChromium
 import io.orangebuffalo.testcontainers.playwright.junit.RequiresFirefox
@@ -74,6 +75,12 @@ internal class PlaywrightContainerExtensionTest {
                 .navigateAndVerify()
                 .shouldRunInChromium()
         }
+
+        @Test
+        fun `for page`(page: Page) {
+            page.navigateAndVerify()
+                .shouldRunInChromium()
+        }
     }
 
     @Nested
@@ -87,6 +94,12 @@ internal class PlaywrightContainerExtensionTest {
                 .navigateAndVerify()
                 .shouldRunInChromium()
         }
+
+        @Test
+        fun `for page`(@RequiresChromium page: Page) {
+            page.navigateAndVerify()
+                .shouldRunInChromium()
+        }
     }
 
     @Nested
@@ -98,6 +111,12 @@ internal class PlaywrightContainerExtensionTest {
         fun `for browser context`(@MetaRequiresChromium browserContext: BrowserContext) {
             browserContext.newPage()
                 .navigateAndVerify()
+                .shouldRunInChromium()
+        }
+
+        @Test
+        fun `for page`(@MetaRequiresChromium page: Page) {
+            page.navigateAndVerify()
                 .shouldRunInChromium()
         }
     }
@@ -114,6 +133,13 @@ internal class PlaywrightContainerExtensionTest {
                 .navigateAndVerify()
                 .shouldRunInChromium()
         }
+
+        @Test
+        @RequiresChromium
+        fun `for page`(page: Page) {
+            page.navigateAndVerify()
+                .shouldRunInChromium()
+        }
     }
 
     @Nested
@@ -126,6 +152,13 @@ internal class PlaywrightContainerExtensionTest {
         fun `for browser context`(browserContext: BrowserContext) {
             browserContext.newPage()
                 .navigateAndVerify()
+                .shouldRunInChromium()
+        }
+
+        @Test
+        @MetaRequiresChromium
+        fun `for page`(page: Page) {
+            page.navigateAndVerify()
                 .shouldRunInChromium()
         }
     }
@@ -142,6 +175,12 @@ internal class PlaywrightContainerExtensionTest {
                 .navigateAndVerify()
                 .shouldRunInChromium()
         }
+
+        @Test
+        fun `for page`(page: Page) {
+            page.navigateAndVerify()
+                .shouldRunInChromium()
+        }
     }
 
     @Nested
@@ -154,6 +193,12 @@ internal class PlaywrightContainerExtensionTest {
         fun `for browser context`(browserContext: BrowserContext) {
             browserContext.newPage()
                 .navigateAndVerify()
+                .shouldRunInChromium()
+        }
+
+        @Test
+        fun `for page`(page: Page) {
+            page.navigateAndVerify()
                 .shouldRunInChromium()
         }
     }
@@ -169,6 +214,12 @@ internal class PlaywrightContainerExtensionTest {
                 .navigateAndVerify()
                 .shouldRunInFirefox()
         }
+
+        @Test
+        fun `for page`(@RequiresFirefox page: Page) {
+            page.navigateAndVerify()
+                .shouldRunInFirefox()
+        }
     }
 
     @Nested
@@ -180,6 +231,12 @@ internal class PlaywrightContainerExtensionTest {
         fun `for browser context`(@MetaRequiresFirefox browserContext: BrowserContext) {
             browserContext.newPage()
                 .navigateAndVerify()
+                .shouldRunInFirefox()
+        }
+
+        @Test
+        fun `for page`(@MetaRequiresFirefox page: Page) {
+            page.navigateAndVerify()
                 .shouldRunInFirefox()
         }
     }
@@ -196,6 +253,13 @@ internal class PlaywrightContainerExtensionTest {
                 .navigateAndVerify()
                 .shouldRunInFirefox()
         }
+
+        @Test
+        @RequiresFirefox
+        fun `for page`(page: Page) {
+            page.navigateAndVerify()
+                .shouldRunInFirefox()
+        }
     }
 
     @Nested
@@ -208,6 +272,13 @@ internal class PlaywrightContainerExtensionTest {
         fun `for browser context`(browserContext: BrowserContext) {
             browserContext.newPage()
                 .navigateAndVerify()
+                .shouldRunInFirefox()
+        }
+
+        @Test
+        @MetaRequiresFirefox
+        fun `for page`(page: Page) {
+            page.navigateAndVerify()
                 .shouldRunInFirefox()
         }
     }
@@ -224,6 +295,12 @@ internal class PlaywrightContainerExtensionTest {
                 .navigateAndVerify()
                 .shouldRunInFirefox()
         }
+
+        @Test
+        fun `for page`(page: Page) {
+            page.navigateAndVerify()
+                .shouldRunInFirefox()
+        }
     }
 
     @Nested
@@ -236,6 +313,12 @@ internal class PlaywrightContainerExtensionTest {
         fun `for browser context`(browserContext: BrowserContext) {
             browserContext.newPage()
                 .navigateAndVerify()
+                .shouldRunInFirefox()
+        }
+
+        @Test
+        fun `for page`(page: Page) {
+            page.navigateAndVerify()
                 .shouldRunInFirefox()
         }
     }
@@ -251,6 +334,12 @@ internal class PlaywrightContainerExtensionTest {
                 .navigateAndVerify()
                 .shouldRunInWebkit()
         }
+
+        @Test
+        fun `for page`(@RequiresWebkit page: Page) {
+            page.navigateAndVerify()
+                .shouldRunInWebkit()
+        }
     }
 
     @Nested
@@ -262,6 +351,12 @@ internal class PlaywrightContainerExtensionTest {
         fun `for browser context`(@MetaRequiresWebkit browserContext: BrowserContext) {
             browserContext.newPage()
                 .navigateAndVerify()
+                .shouldRunInWebkit()
+        }
+
+        @Test
+        fun `for page`(@MetaRequiresWebkit page: Page) {
+            page.navigateAndVerify()
                 .shouldRunInWebkit()
         }
     }
@@ -278,6 +373,13 @@ internal class PlaywrightContainerExtensionTest {
                 .navigateAndVerify()
                 .shouldRunInWebkit()
         }
+
+        @Test
+        @RequiresWebkit
+        fun `for page`(page: Page) {
+            page.navigateAndVerify()
+                .shouldRunInWebkit()
+        }
     }
 
     @Nested
@@ -290,6 +392,13 @@ internal class PlaywrightContainerExtensionTest {
         fun `for browser context`(browserContext: BrowserContext) {
             browserContext.newPage()
                 .navigateAndVerify()
+                .shouldRunInWebkit()
+        }
+
+        @Test
+        @MetaRequiresWebkit
+        fun `for page`(page: Page) {
+            page.navigateAndVerify()
                 .shouldRunInWebkit()
         }
     }
@@ -306,6 +415,12 @@ internal class PlaywrightContainerExtensionTest {
                 .navigateAndVerify()
                 .shouldRunInWebkit()
         }
+
+        @Test
+        fun `for page`(page: Page) {
+            page.navigateAndVerify()
+                .shouldRunInWebkit()
+        }
     }
 
     @Nested
@@ -318,6 +433,12 @@ internal class PlaywrightContainerExtensionTest {
         fun `for browser context`(browserContext: BrowserContext) {
             browserContext.newPage()
                 .navigateAndVerify()
+                .shouldRunInWebkit()
+        }
+
+        @Test
+        fun `for page`(page: Page) {
+            page.navigateAndVerify()
                 .shouldRunInWebkit()
         }
     }

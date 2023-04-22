@@ -1,6 +1,7 @@
 package io.orangebuffalo.testcontainers.playwright.junit
 
 import com.microsoft.playwright.BrowserContext
+import com.microsoft.playwright.Page
 import io.orangebuffalo.testcontainers.playwright.PlaywrightContainer
 import io.orangebuffalo.testcontainers.playwright.PlaywrightContainerApi
 import org.junit.jupiter.api.extension.*
@@ -35,6 +36,7 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
     override fun supportsParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Boolean {
         return isContainerApiParameter(parameterContext)
                 || isBrowserContextParameter(parameterContext)
+                || isPage(parameterContext)
     }
 
     override fun resolveParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Any {
@@ -43,11 +45,19 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
         val containerApi = containerApiPerThread.get()
         return when {
             isContainerApiParameter(parameterContext) -> containerApi
+
             isBrowserContextParameter(parameterContext) -> createBrowserContext(
                 parameterContext,
                 extensionContext,
                 containerApi
             )
+
+            isPage(parameterContext) -> createBrowserContext(
+                parameterContext,
+                extensionContext,
+                containerApi
+            ).newPage()
+
             else -> throw IllegalArgumentException("Unsupported parameter type: ${parameterContext.parameter.type}")
         }
     }
@@ -78,6 +88,11 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
     private fun isBrowserContextParameter(parameterContext: ParameterContext): Boolean {
         val parameterClass = parameterContext.parameter.type
         return BrowserContext::class.java == parameterClass
+    }
+
+    private fun isPage(parameterContext: ParameterContext): Boolean {
+        val parameterClass = parameterContext.parameter.type
+        return Page::class.java == parameterClass
     }
 
     private fun hasAnnotation(
