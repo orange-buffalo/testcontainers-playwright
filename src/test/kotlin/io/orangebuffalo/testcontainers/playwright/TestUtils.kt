@@ -5,24 +5,25 @@ import com.microsoft.playwright.Page
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.string.shouldContain
 
-internal fun Browser.openAndVerifyTestPage(): Page {
-    val page = newPage()
-    page.navigate("https://github.com/microsoft/playwright")
-    page.title().shouldContain("Playwright")
-    return page
+internal fun Page.navigateAndVerify(): Page {
+    navigate("https://github.com/microsoft/playwright")
+    title().shouldContain("Playwright")
+    return this
 }
 
+internal fun Browser.openAndVerifyTestPage(): Page = newPage().navigateAndVerify()
+
 internal fun Page.shouldRunInChromium() {
-    val isChromium = evaluate("navigator.userAgent.indexOf('Chrome') !== -1") as Boolean
+    val isChromium = evaluate("navigator.userAgent.includes('HeadlessChrome')") as Boolean
     isChromium.shouldBeTrue()
 }
 
 internal fun Page.shouldRunInFirefox() {
-    val isFirefox = evaluate("navigator.userAgent.indexOf('Firefox') !== -1") as Boolean
+    val isFirefox = evaluate("navigator.userAgent.includes('Firefox')") as Boolean
     isFirefox.shouldBeTrue()
 }
 
 internal fun Page.shouldRunInWebkit() {
-    val isWebKit = evaluate("navigator.userAgent.indexOf('WebKit') !== -1") as Boolean
+    val isWebKit = evaluate("!navigator.userAgent.includes('HeadlessChrome') && !navigator.userAgent.includes('Firefox')") as Boolean
     isWebKit.shouldBeTrue()
 }

@@ -9,23 +9,26 @@ internal class PlaywrightContainerImperativeTest {
 
     @Test
     fun shouldProvideValidChromiumBrowser() = withContainer {
-        val playwright = registerNewPlaywright()
-        val page = playwright.chromium().openAndVerifyTestPage()
-        page.shouldRunInChromium()
+        registerNewPlaywright()
+            .chromium()
+            .openAndVerifyTestPage()
+            .shouldRunInChromium()
     }
 
     @Test
     fun shouldProvideValidFirefoxBrowser() = withContainer {
-        val playwright = registerNewPlaywright()
-        val page = playwright.firefox().openAndVerifyTestPage()
-        page.shouldRunInFirefox()
+        registerNewPlaywright()
+            .firefox()
+            .openAndVerifyTestPage()
+            .shouldRunInFirefox()
     }
 
     @Test
     fun shouldProvideValidWebkitBrowser() = withContainer {
-        val playwright = registerNewPlaywright()
-        val page = playwright.webkit().openAndVerifyTestPage()
-        page.shouldRunInWebkit()
+        registerNewPlaywright()
+            .webkit()
+            .openAndVerifyTestPage()
+            .shouldRunInWebkit()
     }
 
     private fun withContainer(block: PlaywrightContainer.() -> Unit) {
