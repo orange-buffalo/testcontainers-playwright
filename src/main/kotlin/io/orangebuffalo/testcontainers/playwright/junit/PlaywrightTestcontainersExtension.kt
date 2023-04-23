@@ -5,7 +5,7 @@ import com.microsoft.playwright.Page
 import io.orangebuffalo.testcontainers.playwright.PlaywrightContainer
 import io.orangebuffalo.testcontainers.playwright.PlaywrightContainerApi
 import org.junit.jupiter.api.extension.*
-import java.lang.reflect.AnnotatedElement
+import kotlin.reflect.KClass
 
 private val log = mu.KotlinLogging.logger {}
 
@@ -67,9 +67,9 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
         extensionContext: ExtensionContext,
         containerApi: PlaywrightContainerApi,
     ): BrowserContext {
-        val context = if (hasAnnotation(parameterContext, extensionContext, RequiresWebkit::class.java)) {
+        val context = if (hasAnnotation(parameterContext, extensionContext, RequiresWebkit::class)) {
             containerApi.webkit().newContext()
-        } else if (hasAnnotation(parameterContext, extensionContext, RequiresFirefox::class.java)) {
+        } else if (hasAnnotation(parameterContext, extensionContext, RequiresFirefox::class)) {
             containerApi.firefox().newContext()
         } else {
             containerApi.chromium().newContext()
@@ -98,37 +98,11 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
     private fun hasAnnotation(
         parameterContext: ParameterContext,
         extensionContext: ExtensionContext,
-        annotationClass: Class<out Annotation>
+        annotationClass: KClass<out Annotation>
     ): Boolean {
         return hasAnnotation(parameterContext.parameter, annotationClass)
                 || hasAnnotation(extensionContext.requiredTestMethod, annotationClass)
                 || hasAnnotation(extensionContext.requiredTestClass, annotationClass)
-    }
-
-    private fun hasAnnotation(element: AnnotatedElement, annotationClass: Class<out Annotation>): Boolean {
-        return isAnnotatedWith(element, annotationClass) || isMetaAnnotatedWith(element, annotationClass)
-    }
-
-    private fun isAnnotatedWith(element: AnnotatedElement, annotationClass: Class<out Annotation>): Boolean {
-        return element.isAnnotationPresent(annotationClass)
-    }
-
-    private fun isMetaAnnotatedWith(
-        element: AnnotatedElement,
-        annotationClass: Class<out Annotation>,
-        visited: MutableSet<AnnotatedElement> = mutableSetOf()
-    ): Boolean {
-        val annotations = element.annotations
-        for (annotation in annotations) {
-            if (annotation.annotationClass.java == annotationClass) {
-                return true
-            }
-            val next = annotation.annotationClass.java
-            if (visited.add(next) && isMetaAnnotatedWith(next, annotationClass, visited)) {
-                return true
-            }
-        }
-        return false
     }
 
     override fun afterEach(context: ExtensionContext) {
