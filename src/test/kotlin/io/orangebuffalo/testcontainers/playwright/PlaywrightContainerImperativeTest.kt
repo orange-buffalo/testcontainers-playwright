@@ -1,7 +1,7 @@
 package io.orangebuffalo.testcontainers.playwright
 
 import mu.KotlinLogging
-import kotlin.test.Test
+import org.junit.jupiter.api.Test
 
 var log = KotlinLogging.logger {}
 

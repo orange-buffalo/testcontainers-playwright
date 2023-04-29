@@ -20,12 +20,13 @@ dependencies {
     compileOnly("com.microsoft.playwright:playwright:1.32.0")
     compileOnly("org.junit.jupiter:junit-jupiter-api:5.9.2")
 
-    testImplementation(kotlin("test"))
     testImplementation("io.kotest:kotest-assertions-core:4.0.7")
     testImplementation("com.microsoft.playwright:playwright:1.32.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testImplementation("org.testcontainers:nginx:1.18.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
 
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
     testRuntimeOnly("ch.qos.logback:logback-classic:1.4.6")
 }
 
