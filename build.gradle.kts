@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "1.8.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
+    `maven-publish`
 }
 
 group = "io.orange-buffalo"
@@ -34,4 +35,16 @@ tasks.test {
 
 kotlin {
     jvmToolchain(11)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+
+            from(components["kotlin"])
+        }
+    }
 }
