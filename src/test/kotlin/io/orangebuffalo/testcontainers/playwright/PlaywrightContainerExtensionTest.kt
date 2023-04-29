@@ -2,10 +2,8 @@ package io.orangebuffalo.testcontainers.playwright
 
 import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Page
-import io.orangebuffalo.testcontainers.playwright.junit.PlaywrightTestcontainersExtension
-import io.orangebuffalo.testcontainers.playwright.junit.RequiresChromium
-import io.orangebuffalo.testcontainers.playwright.junit.RequiresFirefox
-import io.orangebuffalo.testcontainers.playwright.junit.RequiresWebkit
+import io.kotest.matchers.string.shouldContain
+import io.orangebuffalo.testcontainers.playwright.junit.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -17,8 +15,21 @@ import org.junit.jupiter.api.parallel.ExecutionMode
 internal class PlaywrightContainerExtensionTest {
 
     @Nested
-    @DisplayName("should provide low level API")
+    @DisplayName("should provide default container without PlaywrightTestcontainersConfig")
     @ExtendWith(PlaywrightTestcontainersExtension::class)
+    inner class DefaultContainer {
+
+        @Test
+        fun `that runs`(playwright: PlaywrightContainerApi) {
+            val page = playwright.chromium().newPage()
+            page.navigate("https://github.com/microsoft/playwright")
+            page.title().shouldContain("Playwright")
+        }
+    }
+
+    @Nested
+    @DisplayName("should provide low level API")
+    @UseExtensionUnderTest
     inner class LowLevelApi {
 
         @Test
@@ -42,7 +53,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should support parallel execution")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     inner class ParallelExecution {
 
         @Test
@@ -66,7 +77,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide chromium as default")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     inner class DefaultInjections {
 
         @Test
@@ -85,7 +96,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide chromium by parameter annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     inner class ChromiumInjectsWithParameterAnnotations {
 
         @Test
@@ -104,7 +115,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide chromium by parameter meta annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     inner class ChromiumInjectsWithParameterMetaAnnotations {
 
         @Test
@@ -123,7 +134,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide chromium by method annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     inner class ChromiumInjectsWithMethodAnnotations {
 
         @Test
@@ -144,7 +155,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide chromium by method meta annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     inner class ChromiumInjectsWithMethodMetaAnnotations {
 
         @Test
@@ -165,7 +176,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide chromium by class annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     @RequiresChromium
     inner class ChromiumInjectsWithClassAnnotations {
 
@@ -185,7 +196,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide chromium by class meta annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     @MetaRequiresChromium
     inner class ChromiumInjectsWithClassMetaAnnotations {
 
@@ -205,7 +216,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide firefox by parameter annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     inner class FirefoxInjectsWithParameterAnnotations {
 
         @Test
@@ -224,7 +235,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide firefox by parameter meta annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     inner class FirefoxInjectsWithParameterMetaAnnotations {
 
         @Test
@@ -243,7 +254,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide firefox by method annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     inner class FirefoxInjectsWithMethodAnnotations {
 
         @Test
@@ -264,7 +275,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide firefox by method meta annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     inner class FirefoxInjectsWithMethodMetaAnnotations {
 
         @Test
@@ -285,7 +296,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide firefox by class annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     @RequiresFirefox
     inner class FirefoxInjectsWithClassAnnotations {
 
@@ -305,7 +316,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide firefox by class meta annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     @MetaRequiresFirefox
     inner class FirefoxInjectsWithClassMetaAnnotations {
 
@@ -325,7 +336,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide webkit by parameter annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     inner class WebkitInjectsWithParameterAnnotations {
 
         @Test
@@ -344,7 +355,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide webkit by parameter meta annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     inner class WebkitInjectsWithParameterMetaAnnotations {
 
         @Test
@@ -363,7 +374,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide webkit by method annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     inner class WebkitInjectsWithMethodAnnotations {
 
         @Test
@@ -384,7 +395,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide webkit by method meta annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     inner class WebkitInjectsWithMethodMetaAnnotations {
 
         @Test
@@ -405,7 +416,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide webkit by class annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     @RequiresWebkit
     inner class WebkitInjectsWithClassAnnotations {
 
@@ -425,7 +436,7 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should provide webkit by class meta annotation")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @UseExtensionUnderTest
     @MetaRequiresWebkit
     inner class WebkitInjectsWithClassMetaAnnotations {
 
@@ -457,4 +468,16 @@ internal class PlaywrightContainerExtensionTest {
     @Retention(AnnotationRetention.RUNTIME)
     @RequiresWebkit
     annotation class MetaRequiresWebkit
+
+    @Target(AnnotationTarget.CLASS)
+    @Retention(AnnotationRetention.RUNTIME)
+    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @PlaywrightTestcontainersConfig(TestExtensionsConfigurer::class)
+    annotation class UseExtensionUnderTest
+
+    class TestExtensionsConfigurer: PlaywrightTestcontainersConfigurer {
+        override fun setupContainer(container: PlaywrightContainer) {
+            container.connectToWebServer()
+        }
+    }
 }

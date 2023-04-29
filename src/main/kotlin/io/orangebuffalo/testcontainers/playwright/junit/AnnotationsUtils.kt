@@ -4,27 +4,37 @@ import java.lang.reflect.AnnotatedElement
 import kotlin.reflect.KClass
 
 internal fun hasAnnotation(element: AnnotatedElement, annotationClass: KClass<out Annotation>): Boolean {
-    return isAnnotatedWith(element, annotationClass) || isMetaAnnotatedWith(element, annotationClass)
+    return findAnnotation(element, annotationClass) != null
+            || findMetaAnnotation(element, annotationClass) != null
 }
 
-internal fun isAnnotatedWith(element: AnnotatedElement, annotationClass: KClass<out Annotation>): Boolean {
-    return element.isAnnotationPresent(annotationClass.java)
+internal fun <A : Annotation> getAnnotation(element: AnnotatedElement, annotationClass: KClass<out A>): A? {
+    return findAnnotation(element, annotationClass)
+        ?: findMetaAnnotation(element, annotationClass)
 }
 
-internal fun isMetaAnnotatedWith(
+private fun <A : Annotation> findAnnotation(element: AnnotatedElement, annotationClass: KClass<out A>): A? {
+    return element.getAnnotation(annotationClass.java)
+}
+
+@Suppress("UNCHECKED_CAST")
+private fun <A : Annotation> findMetaAnnotation(
     element: AnnotatedElement,
-    annotationClass: KClass<out Annotation>,
+    annotationClass: KClass<out A>,
     visited: MutableSet<AnnotatedElement> = mutableSetOf()
-): Boolean {
+): A? {
     val annotations = element.annotations
     for (annotation in annotations) {
         if (annotation.annotationClass == annotationClass) {
-            return true
+            return annotation as A
         }
         val next = annotation.annotationClass.java
-        if (visited.add(next) && isMetaAnnotatedWith(next, annotationClass, visited)) {
-            return true
+        if (visited.add(next)) {
+            val nextResult = findMetaAnnotation(next, annotationClass, visited)
+            if (nextResult != null) {
+                return nextResult
+            }
         }
     }
-    return false
+    return null
 }

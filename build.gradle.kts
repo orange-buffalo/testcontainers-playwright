@@ -23,6 +23,7 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:4.0.7")
     testImplementation("com.microsoft.playwright:playwright:1.32.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    testImplementation("org.testcontainers:nginx:1.18.0")
 
     testRuntimeOnly("ch.qos.logback:logback-classic:1.4.6")
 }

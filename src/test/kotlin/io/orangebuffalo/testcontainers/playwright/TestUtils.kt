@@ -4,10 +4,14 @@ import com.microsoft.playwright.Browser
 import com.microsoft.playwright.Page
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.string.shouldContain
+import org.testcontainers.containers.Network
+import org.testcontainers.containers.NginxContainer
+import org.testcontainers.containers.wait.strategy.HttpWaitStrategy
+import org.testcontainers.utility.MountableFile
 
 internal fun Page.navigateAndVerify(): Page {
-    navigate("https://github.com/microsoft/playwright")
-    title().shouldContain("Playwright")
+    navigate("http://web/")
+    title().shouldContain("Playwright Testcontainers Page")
     return this
 }
 
@@ -26,4 +30,17 @@ internal fun Page.shouldRunInFirefox() {
 internal fun Page.shouldRunInWebkit() {
     val isWebKit = evaluate("!navigator.userAgent.includes('HeadlessChrome') && !navigator.userAgent.includes('Firefox')") as Boolean
     isWebKit.shouldBeTrue()
+}
+
+private val testNetwork = Network.newNetwork()
+
+private val nginx = NginxContainer("nginx")
+    .withCopyToContainer(MountableFile.forClasspathResource("/html"), "/usr/share/nginx/html")
+    .waitingFor(HttpWaitStrategy())
+    .withNetwork(testNetwork)
+    .withNetworkAliases("web")
+
+internal fun PlaywrightContainer.connectToWebServer() {
+    withNetwork(testNetwork)
+    dependsOn(nginx)
 }

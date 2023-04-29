@@ -39,6 +39,10 @@ async function launchBrowserServer(request) {
   const browserServer = await browserType.launchServer(config);
   browsers.push(browserServer);
   const wsEndpoint = browserServer.wsEndpoint();
+  process.on('exit', (code) => {
+    console.info(`Closing ${request.browser} on exit (${code})`);
+    browserServer.close();
+  });
   console.info(`Browser WebSocket Endpoint (internal): ${wsEndpoint}`);
   return wsPath;
 }

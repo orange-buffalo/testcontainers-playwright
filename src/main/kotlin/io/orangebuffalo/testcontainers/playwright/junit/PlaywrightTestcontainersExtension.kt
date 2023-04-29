@@ -5,30 +5,11 @@ import com.microsoft.playwright.Page
 import io.orangebuffalo.testcontainers.playwright.PlaywrightContainer
 import io.orangebuffalo.testcontainers.playwright.PlaywrightContainerApi
 import org.junit.jupiter.api.extension.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
 
 private val log = mu.KotlinLogging.logger {}
-
-private var container: PlaywrightContainer? = null
-private val containerApiPerThread = ThreadLocal.withInitial {
-    log.info { "Registering new API for ${Thread.currentThread().name}" }
-    ensureContainer().registerNewPlaywright()
-}
-
-@Synchronized
-private fun ensureContainer(): PlaywrightContainer {
-    if (container == null) {
-        log.info { "Starting Playwright container" }
-        container = PlaywrightContainer()
-            .withLogConsumer {
-                log.debug { "[CONTAINER] ${it.utf8String}" }
-            }
-            .also { it.start() }
-        log.info { "Playwright container started" }
-    }
-    return container!!
-}
-
+private var containers = ConcurrentHashMap<String?, PlaywrightContainer>()
 private val extensionNamespace = ExtensionContext.Namespace.create("io.orangebuffalo.testcontainers.playwright")
 private const val BROWSER_CONTEXTS_KEY = "browserContexts"
 
@@ -42,7 +23,7 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
     override fun resolveParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Any {
         log.debug { "Resolving parameter ${parameterContext.parameter} in ${extensionContext.displayName}" }
 
-        val containerApi = containerApiPerThread.get()
+        val containerApi = getOrCreateContainerApi(extensionContext)
         return when {
             isContainerApiParameter(parameterContext) -> containerApi
 
@@ -119,4 +100,29 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
                 mutableListOf()
             } as MutableList<BrowserContext>
     }
+
+    private fun getOrCreateContainerApi(extensionContext: ExtensionContext): PlaywrightContainerApi {
+        val config = extensionContext.getConfig()
+        val container = containers.computeIfAbsent(config.containerStorageKey) { configKey ->
+            log.info { "Starting Playwright container for $configKey config" }
+
+            val configurer = config?.configurer?.java?.getDeclaredConstructor()?.newInstance()
+            val container = configurer?.provideContainer() ?: PlaywrightContainer()
+            container
+                .withLogConsumer {
+                    log.debug { "[CONTAINER] ${it.utf8String}" }
+                }
+                .also {
+                    configurer?.setupContainer(it)
+                    it.start()
+                    log.info { "Playwright container started" }
+                }
+        }
+        return container.getPlaywrightContainerApi()
+    }
+
+    private fun ExtensionContext.getConfig() = getAnnotation(requiredTestClass, PlaywrightTestcontainersConfig::class)
 }
+
+private val PlaywrightTestcontainersConfig?.containerStorageKey : String
+    get() = this?.configurer?.qualifiedName ?: "default"

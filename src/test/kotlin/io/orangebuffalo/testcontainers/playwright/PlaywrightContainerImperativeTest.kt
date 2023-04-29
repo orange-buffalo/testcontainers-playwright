@@ -9,7 +9,7 @@ internal class PlaywrightContainerImperativeTest {
 
     @Test
     fun shouldProvideValidChromiumBrowser() = withContainer {
-        registerNewPlaywright()
+        getPlaywrightContainerApi()
             .chromium()
             .openAndVerifyTestPage()
             .shouldRunInChromium()
@@ -17,7 +17,7 @@ internal class PlaywrightContainerImperativeTest {
 
     @Test
     fun shouldProvideValidFirefoxBrowser() = withContainer {
-        registerNewPlaywright()
+        getPlaywrightContainerApi()
             .firefox()
             .openAndVerifyTestPage()
             .shouldRunInFirefox()
@@ -25,7 +25,7 @@ internal class PlaywrightContainerImperativeTest {
 
     @Test
     fun shouldProvideValidWebkitBrowser() = withContainer {
-        registerNewPlaywright()
+        getPlaywrightContainerApi()
             .webkit()
             .openAndVerifyTestPage()
             .shouldRunInWebkit()
@@ -33,6 +33,7 @@ internal class PlaywrightContainerImperativeTest {
 
     private fun withContainer(block: PlaywrightContainer.() -> Unit) {
         PlaywrightContainer().use { container ->
+            container.connectToWebServer()
             container.logConsumers.add { log.info { "[CONTAINER] ${it.utf8String}" } }
             container.start()
             block(container)
