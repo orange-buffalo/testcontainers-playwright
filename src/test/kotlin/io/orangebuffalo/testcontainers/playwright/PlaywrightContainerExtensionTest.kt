@@ -3,6 +3,8 @@ package io.orangebuffalo.testcontainers.playwright
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Page
+import com.microsoft.playwright.TimeoutError
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.orangebuffalo.testcontainers.playwright.junit.*
@@ -457,21 +459,18 @@ internal class PlaywrightContainerExtensionTest {
     }
 
     @Nested
-    @DisplayName("should allow to configure browser context")
+    @DisplayName("should allow to provide browser context options")
     @ExtendWith(PlaywrightTestcontainersExtension::class)
     @PlaywrightTestcontainersConfig(BrowserContextOptionsConfigurer::class)
     inner class BrowserContextOptions {
 
         @Test
-        fun `for browser context`(browserContext: BrowserContext) {
-            val browserScreenWidth = browserContext.newPage()
-                .navigateAndVerify()
-                .evaluate("window.screen.width") as Int
-            browserScreenWidth.shouldBe(2000)
-        }
+        fun `for browser context`(browserContext: BrowserContext) = executeTest(browserContext.newPage())
 
         @Test
-        fun `for page`(page: Page) {
+        fun `for page`(page: Page) = executeTest(page)
+
+        private fun executeTest(page: Page) {
             val browserScreenWidth = page
                 .navigateAndVerify()
                 .evaluate("window.screen.width") as Int
@@ -482,6 +481,33 @@ internal class PlaywrightContainerExtensionTest {
     class BrowserContextOptionsConfigurer : TestExtensionsConfigurer() {
         override fun createBrowserContextOptions(): Browser.NewContextOptions =
             Browser.NewContextOptions().setViewportSize(2000, 1000)
+    }
+
+    @Nested
+    @DisplayName("should allow to configure created browser contexts")
+    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @PlaywrightTestcontainersConfig(BrowserContextSetupConfigurer::class)
+    inner class BrowserContextSetup {
+
+        @Test
+        fun `for browser context`(browserContext: BrowserContext) = executeTest(browserContext.newPage())
+
+        @Test
+        fun `for page`(page: Page) = executeTest(page)
+
+        private fun executeTest(page: Page) {
+            page.navigateAndVerify()
+            val exception = shouldThrow<TimeoutError> {
+                page.getByLabel("Non existent").blur()
+            }
+            exception.message.shouldContain("Timeout 20ms exceeded")
+        }
+    }
+
+    class BrowserContextSetupConfigurer : TestExtensionsConfigurer() {
+        override fun configureBrowserContext(context: BrowserContext) {
+            context.setDefaultTimeout(20.0)
+        }
     }
 
     @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)

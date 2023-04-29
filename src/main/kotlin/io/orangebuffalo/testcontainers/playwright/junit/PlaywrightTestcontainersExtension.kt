@@ -57,6 +57,7 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
             containerApi.chromium().newContext(configurer?.createBrowserContextOptions())
         }
 
+        configurer?.configureBrowserContext(context)
         extensionContext.getBrowserContexts().add(context)
 
         return context
