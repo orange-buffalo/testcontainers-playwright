@@ -1,5 +1,6 @@
 package io.orangebuffalo.testcontainers.playwright.junit
 
+import com.microsoft.playwright.Browser.NewContextOptions
 import io.orangebuffalo.testcontainers.playwright.PlaywrightContainer
 import kotlin.reflect.KClass
 
@@ -12,4 +13,6 @@ interface PlaywrightTestcontainersConfigurer {
     fun provideContainer(): PlaywrightContainer = PlaywrightContainer()
 
     fun setupContainer(container: PlaywrightContainer) {}
+
+    fun createBrowserContextOptions(): NewContextOptions? = null
 }

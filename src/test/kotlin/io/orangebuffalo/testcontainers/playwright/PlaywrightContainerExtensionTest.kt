@@ -1,7 +1,9 @@
 package io.orangebuffalo.testcontainers.playwright
 
+import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Page
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.orangebuffalo.testcontainers.playwright.junit.*
 import org.junit.jupiter.api.DisplayName
@@ -454,6 +456,34 @@ internal class PlaywrightContainerExtensionTest {
         }
     }
 
+    @Nested
+    @DisplayName("should allow to configure browser context")
+    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @PlaywrightTestcontainersConfig(BrowserContextOptionsConfigurer::class)
+    inner class BrowserContextOptions {
+
+        @Test
+        fun `for browser context`(browserContext: BrowserContext) {
+            val browserScreenWidth = browserContext.newPage()
+                .navigateAndVerify()
+                .evaluate("window.screen.width") as Int
+            browserScreenWidth.shouldBe(2000)
+        }
+
+        @Test
+        fun `for page`(page: Page) {
+            val browserScreenWidth = page
+                .navigateAndVerify()
+                .evaluate("window.screen.width") as Int
+            browserScreenWidth.shouldBe(2000)
+        }
+    }
+
+    class BrowserContextOptionsConfigurer : TestExtensionsConfigurer() {
+        override fun createBrowserContextOptions(): Browser.NewContextOptions =
+            Browser.NewContextOptions().setViewportSize(2000, 1000)
+    }
+
     @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
     @Retention(AnnotationRetention.RUNTIME)
     @RequiresChromium
@@ -475,7 +505,7 @@ internal class PlaywrightContainerExtensionTest {
     @PlaywrightTestcontainersConfig(TestExtensionsConfigurer::class)
     annotation class UseExtensionUnderTest
 
-    class TestExtensionsConfigurer: PlaywrightTestcontainersConfigurer {
+    open class TestExtensionsConfigurer : PlaywrightTestcontainersConfigurer {
         override fun setupContainer(container: PlaywrightContainer) {
             container.connectToWebServer()
         }

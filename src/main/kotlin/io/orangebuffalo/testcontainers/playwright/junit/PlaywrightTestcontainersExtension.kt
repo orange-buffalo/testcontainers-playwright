@@ -48,12 +48,13 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
         extensionContext: ExtensionContext,
         containerApi: PlaywrightContainerApi,
     ): BrowserContext {
+        val configurer = extensionContext.getConfig().instantiateConfigurer()
         val context = if (hasAnnotation(parameterContext, extensionContext, RequiresWebkit::class)) {
-            containerApi.webkit().newContext()
+            containerApi.webkit().newContext(configurer?.createBrowserContextOptions())
         } else if (hasAnnotation(parameterContext, extensionContext, RequiresFirefox::class)) {
-            containerApi.firefox().newContext()
+            containerApi.firefox().newContext(configurer?.createBrowserContextOptions())
         } else {
-            containerApi.chromium().newContext()
+            containerApi.chromium().newContext(configurer?.createBrowserContextOptions())
         }
 
         extensionContext.getBrowserContexts().add(context)
@@ -106,7 +107,7 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
         val container = containers.computeIfAbsent(config.containerStorageKey) { configKey ->
             log.info { "Starting Playwright container for $configKey config" }
 
-            val configurer = config?.configurer?.java?.getDeclaredConstructor()?.newInstance()
+            val configurer = config.instantiateConfigurer()
             val container = configurer?.provideContainer() ?: PlaywrightContainer()
             container
                 .withLogConsumer {
@@ -120,9 +121,13 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
         }
         return container.getPlaywrightContainerApi()
     }
-
-    private fun ExtensionContext.getConfig() = getAnnotation(requiredTestClass, PlaywrightTestcontainersConfig::class)
 }
 
-private val PlaywrightTestcontainersConfig?.containerStorageKey : String
+private fun ExtensionContext.getConfig() = getAnnotation(requiredTestClass, PlaywrightTestcontainersConfig::class)
+
+private val PlaywrightTestcontainersConfig?.containerStorageKey: String
     get() = this?.configurer?.qualifiedName ?: "default"
+
+private fun PlaywrightTestcontainersConfig?.instantiateConfigurer(): PlaywrightTestcontainersConfigurer? {
+    return this?.configurer?.java?.getDeclaredConstructor()?.newInstance()
+}
