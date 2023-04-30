@@ -44,7 +44,7 @@ class PlaywrightContainer(private val customImage: DockerImageName? = null) :
             )
         }
 
-        withCopyToContainer(MountableFile.forClasspathResource("app.js"), "/app/app.js")
+        withCopyToContainer(MountableFile.forClasspathResource("playwright-server.js"), "/app/playwright-server.js")
 
         if (customImage == null) {
             log.info { "Will use Playwright image $playwrightVersionCompatibleTag for version $playwrightVersion found on classpath" }
@@ -53,6 +53,7 @@ class PlaywrightContainer(private val customImage: DockerImageName? = null) :
 
         withExposedPorts(apiPort, chromiumPort, firefoxPort, webkitPort)
         waitingFor(LogMessageWaitStrategy().withRegEx("Server running at .*"))
+        withCommand("node", "/app/playwright-server.js")
     }
 
     override fun start() {
