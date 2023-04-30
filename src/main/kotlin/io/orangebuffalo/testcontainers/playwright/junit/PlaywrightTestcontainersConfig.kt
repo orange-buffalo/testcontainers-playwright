@@ -18,4 +18,6 @@ interface PlaywrightTestcontainersConfigurer {
     fun createBrowserContextOptions(): NewContextOptions? = null
 
     fun configureBrowserContext(context: BrowserContext) {}
+
+    fun getPlaywrightContainerApiProvider(): PlaywrightContainerApiProvider? = null
 }

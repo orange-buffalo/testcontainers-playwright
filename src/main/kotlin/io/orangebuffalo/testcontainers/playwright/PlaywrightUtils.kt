@@ -1,5 +1,7 @@
 package io.orangebuffalo.testcontainers.playwright
 
+import com.microsoft.playwright.Browser
+import com.microsoft.playwright.Playwright
 import java.util.jar.Manifest
 
 private val log = mu.KotlinLogging.logger {}
@@ -44,4 +46,20 @@ internal fun getPlaywrightVersionOnClasspath(): String? {
     log.debug { "Found Playwright version $playwrightVersion" }
 
     return playwrightVersion
+}
+
+internal fun Browser.safeClose() {
+    try {
+        close()
+    } catch (e: Exception) {
+        log.warn(e) { "Failed to close browser" }
+    }
+}
+
+internal fun Playwright.safeClose() {
+    try {
+        close()
+    } catch (e: Exception) {
+        log.warn(e) { "Failed to close playwright" }
+    }
 }

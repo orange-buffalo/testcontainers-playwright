@@ -1,36 +1,31 @@
-package io.orangebuffalo.testcontainers.playwright
+package io.orangebuffalo.testcontainers.playwright.junit
 
 import com.microsoft.playwright.Browser
+import com.microsoft.playwright.BrowserType
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Selectors
-import java.util.concurrent.ConcurrentHashMap
-
+import io.orangebuffalo.testcontainers.playwright.PlaywrightContainerApi
+import io.orangebuffalo.testcontainers.playwright.safeClose
 
 /**
  * Manages instances of [PlaywrightContainerApi] per thread, bound to a particular container.
  */
-internal class PlaywrightApiManager(
-    private val container: PlaywrightContainer,
-) {
+class LocalPlaywrightContainerApiProvider : PlaywrightContainerApiProvider {
 
-    private val playwrightApis = ConcurrentHashMap<Long, PlaywrightContainerApiImpl>()
-
-    fun close() {
-        playwrightApis.values.forEach { it.close() }
-    }
-
-    fun getContainerApi(): PlaywrightContainerApi = playwrightApis.computeIfAbsent(Thread.currentThread().id) {
-        val api = PlaywrightContainerApiImpl()
+    private val playwrightApis = ThreadLocal.withInitial {
+        val api = LocalPlaywrightApiImpl()
         Runtime.getRuntime().addShutdownHook(Thread {
             api.close()
         })
         api
     }
 
+    override fun getOrCreatePlaywrightContainerApiForCurrentThread(): PlaywrightContainerApi = playwrightApis.get()
+
     /**
      * Per-thread instance, bound to a container
      */
-    private inner class PlaywrightContainerApiImpl : PlaywrightContainerApi {
+    private class LocalPlaywrightApiImpl : PlaywrightContainerApi {
 
         private val playwright = Playwright.create()
         private var chromiumBrowser: Browser? = null
@@ -39,21 +34,24 @@ internal class PlaywrightApiManager(
 
         override fun chromium(): Browser {
             if (chromiumBrowser == null) {
-                chromiumBrowser = playwright.chromium().connect(container.getChromiumWsEndpoint())
+                chromiumBrowser = playwright.chromium()
+                    .launch(BrowserType.LaunchOptions().setHeadless(false))
             }
             return chromiumBrowser!!
         }
 
         override fun firefox(): Browser {
             if (firefoxBrowser == null) {
-                firefoxBrowser = playwright.firefox().connect(container.getFirefoxWsEndpoint())
+                firefoxBrowser = playwright.firefox()
+                    .launch(BrowserType.LaunchOptions().setHeadless(false))
             }
             return firefoxBrowser!!
         }
 
         override fun webkit(): Browser {
             if (webkitBrowser == null) {
-                webkitBrowser = playwright.webkit().connect(container.getWebkitWsEndpoint())
+                webkitBrowser = playwright.webkit()
+                    .launch(BrowserType.LaunchOptions().setHeadless(false))
             }
             return webkitBrowser!!
         }

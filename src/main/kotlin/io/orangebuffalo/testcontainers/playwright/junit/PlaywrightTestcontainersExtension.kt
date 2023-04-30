@@ -105,10 +105,15 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
 
     private fun getOrCreateContainerApi(extensionContext: ExtensionContext): PlaywrightContainerApi {
         val config = extensionContext.getConfig()
+        val configurer = config.instantiateConfigurer()
+        val playwrightContainerApiProvider = configurer?.getPlaywrightContainerApiProvider()
+        if (playwrightContainerApiProvider != null) {
+            return playwrightContainerApiProvider.getOrCreatePlaywrightContainerApiForCurrentThread()
+        }
+
         val container = containers.computeIfAbsent(config.containerStorageKey) { configKey ->
             log.info { "Starting Playwright container for $configKey config" }
 
-            val configurer = config.instantiateConfigurer()
             val container = configurer?.provideContainer() ?: PlaywrightContainer()
             container
                 .withLogConsumer {
