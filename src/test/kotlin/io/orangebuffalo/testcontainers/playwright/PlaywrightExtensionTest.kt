@@ -16,15 +16,15 @@ import org.junit.jupiter.api.parallel.Execution
 import org.junit.jupiter.api.parallel.ExecutionMode
 
 @DisplayName("JUnit extension")
-internal class PlaywrightContainerExtensionTest {
+internal class PlaywrightExtensionTest {
 
     @Nested
-    @DisplayName("should provide default container without PlaywrightTestcontainersConfig")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
+    @DisplayName("should provide default container without PlaywrightConfig")
+    @ExtendWith(PlaywrightExtension::class)
     inner class DefaultContainer {
 
         @Test
-        fun `that runs`(playwright: PlaywrightContainerApi) {
+        fun `that runs`(playwright: PlaywrightApi) {
             val page = playwright.chromium().newPage()
             page.navigate("https://github.com/microsoft/playwright")
             page.title().shouldContain("Playwright")
@@ -37,19 +37,19 @@ internal class PlaywrightContainerExtensionTest {
     inner class LowLevelApi {
 
         @Test
-        fun `that opens chromium browser`(playwright: PlaywrightContainerApi) {
+        fun `that opens chromium browser`(playwright: PlaywrightApi) {
             val page = playwright.chromium().openAndVerifyTestPage()
             page.shouldRunInChromium()
         }
 
         @Test
-        fun `that opens firefox browser`(playwright: PlaywrightContainerApi) {
+        fun `that opens firefox browser`(playwright: PlaywrightApi) {
             val page = playwright.firefox().openAndVerifyTestPage()
             page.shouldRunInFirefox()
         }
 
         @Test
-        fun `that opens webkit browser`(playwright: PlaywrightContainerApi) {
+        fun `that opens webkit browser`(playwright: PlaywrightApi) {
             val page = playwright.webkit().openAndVerifyTestPage()
             page.shouldRunInWebkit()
         }
@@ -62,19 +62,19 @@ internal class PlaywrightContainerExtensionTest {
 
         @Test
         @Execution(ExecutionMode.CONCURRENT)
-        fun `branch 1`(playwright: PlaywrightContainerApi) {
+        fun `branch 1`(playwright: PlaywrightApi) {
             playwright.chromium().openAndVerifyTestPage()
         }
 
         @Test
         @Execution(ExecutionMode.CONCURRENT)
-        fun `branch 2`(playwright: PlaywrightContainerApi) {
+        fun `branch 2`(playwright: PlaywrightApi) {
             playwright.chromium().openAndVerifyTestPage()
         }
 
         @Test
         @Execution(ExecutionMode.CONCURRENT)
-        fun `branch 3`(playwright: PlaywrightContainerApi) {
+        fun `branch 3`(playwright: PlaywrightApi) {
             playwright.chromium().openAndVerifyTestPage()
         }
     }
@@ -460,8 +460,8 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should allow to provide browser context options")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
-    @PlaywrightTestcontainersConfig(BrowserContextOptionsConfigurer::class)
+    @ExtendWith(PlaywrightExtension::class)
+    @PlaywrightConfig(BrowserContextOptionsConfigurer::class)
     inner class BrowserContextOptions {
 
         @Test
@@ -485,8 +485,8 @@ internal class PlaywrightContainerExtensionTest {
 
     @Nested
     @DisplayName("should allow to configure created browser contexts")
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
-    @PlaywrightTestcontainersConfig(BrowserContextSetupConfigurer::class)
+    @ExtendWith(PlaywrightExtension::class)
+    @PlaywrightConfig(BrowserContextSetupConfigurer::class)
     inner class BrowserContextSetup {
 
         @Test
@@ -505,7 +505,7 @@ internal class PlaywrightContainerExtensionTest {
     }
 
     class BrowserContextSetupConfigurer : TestExtensionsConfigurer() {
-        override fun configureBrowserContext(context: BrowserContext) {
+        override fun setupBrowserContext(context: BrowserContext) {
             context.setDefaultTimeout(20.0)
         }
     }
@@ -527,11 +527,11 @@ internal class PlaywrightContainerExtensionTest {
 
     @Target(AnnotationTarget.CLASS)
     @Retention(AnnotationRetention.RUNTIME)
-    @ExtendWith(PlaywrightTestcontainersExtension::class)
-    @PlaywrightTestcontainersConfig(TestExtensionsConfigurer::class)
+    @ExtendWith(PlaywrightExtension::class)
+    @PlaywrightConfig(TestExtensionsConfigurer::class)
     annotation class UseExtensionUnderTest
 
-    open class TestExtensionsConfigurer : PlaywrightTestcontainersConfigurer {
+    open class TestExtensionsConfigurer : PlaywrightConfigurer {
         override fun setupContainer(container: PlaywrightContainer) {
             container.connectToWebServer()
         }

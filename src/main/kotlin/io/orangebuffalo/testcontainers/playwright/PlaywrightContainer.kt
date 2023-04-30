@@ -76,7 +76,7 @@ class PlaywrightContainer(private val customImage: DockerImageName? = null) :
         }
     }
 
-    fun getPlaywrightContainerApi(): PlaywrightContainerApi = apiManager.getContainerApi()
+    fun getPlaywrightContainerApi(): PlaywrightApi = apiManager.getPlaywrightApi()
 
     override fun close() {
         apiManager.close()
@@ -84,7 +84,7 @@ class PlaywrightContainer(private val customImage: DockerImageName? = null) :
     }
 
     @Synchronized
-    fun getChromiumWsEndpoint(): String {
+    internal fun getChromiumWsEndpoint(): String {
         if (chromiumWsEndpoint == null) {
             chromiumWsEndpoint = createBrowserAndGetWsEndpoint(
                 ContainerApi.LaunchRequest(
@@ -97,7 +97,7 @@ class PlaywrightContainer(private val customImage: DockerImageName? = null) :
     }
 
     @Synchronized
-    fun getFirefoxWsEndpoint(): String {
+    internal fun getFirefoxWsEndpoint(): String {
         if (firefoxWsEndpoint == null) {
             firefoxWsEndpoint = createBrowserAndGetWsEndpoint(
                 ContainerApi.LaunchRequest(
@@ -110,7 +110,7 @@ class PlaywrightContainer(private val customImage: DockerImageName? = null) :
     }
 
     @Synchronized
-    fun getWebkitWsEndpoint(): String {
+    internal fun getWebkitWsEndpoint(): String {
         if (webkitWsEndpoint == null) {
             webkitWsEndpoint = createBrowserAndGetWsEndpoint(
                 ContainerApi.LaunchRequest(

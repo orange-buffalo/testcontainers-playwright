@@ -4,13 +4,13 @@ import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserType
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Selectors
-import io.orangebuffalo.testcontainers.playwright.PlaywrightContainerApi
+import io.orangebuffalo.testcontainers.playwright.PlaywrightApi
 import io.orangebuffalo.testcontainers.playwright.safeClose
 
 /**
- * Manages instances of [PlaywrightContainerApi] per thread, bound to a particular container.
+ * Manages instances of [PlaywrightApi] per thread, bound to a particular container.
  */
-class LocalPlaywrightContainerApiProvider : PlaywrightContainerApiProvider {
+class LocalPlaywrightApiProvider : PlaywrightApiProvider {
 
     private val playwrightApis = ThreadLocal.withInitial {
         val api = LocalPlaywrightApiImpl()
@@ -20,12 +20,12 @@ class LocalPlaywrightContainerApiProvider : PlaywrightContainerApiProvider {
         api
     }
 
-    override fun getOrCreatePlaywrightContainerApiForCurrentThread(): PlaywrightContainerApi = playwrightApis.get()
+    override fun getOrCreatePlaywrightApiForCurrentThread(): PlaywrightApi = playwrightApis.get()
 
     /**
      * Per-thread instance, bound to a container
      */
-    private class LocalPlaywrightApiImpl : PlaywrightContainerApi {
+    private class LocalPlaywrightApiImpl : PlaywrightApi {
 
         private val playwright = Playwright.create()
         private var chromiumBrowser: Browser? = null

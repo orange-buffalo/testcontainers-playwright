@@ -5,22 +5,21 @@ import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Selectors
 import java.util.concurrent.ConcurrentHashMap
 
-
 /**
- * Manages instances of [PlaywrightContainerApi] per thread, bound to a particular container.
+ * Manages instances of [PlaywrightApi] per thread, bound to a particular container.
  */
 internal class PlaywrightApiManager(
     private val container: PlaywrightContainer,
 ) {
 
-    private val playwrightApis = ConcurrentHashMap<Long, PlaywrightContainerApiImpl>()
+    private val playwrightApis = ConcurrentHashMap<Long, PlaywrightApiImpl>()
 
     fun close() {
         playwrightApis.values.forEach { it.close() }
     }
 
-    fun getContainerApi(): PlaywrightContainerApi = playwrightApis.computeIfAbsent(Thread.currentThread().id) {
-        val api = PlaywrightContainerApiImpl()
+    fun getPlaywrightApi(): PlaywrightApi = playwrightApis.computeIfAbsent(Thread.currentThread().id) {
+        val api = PlaywrightApiImpl()
         Runtime.getRuntime().addShutdownHook(Thread {
             api.close()
         })
@@ -30,7 +29,7 @@ internal class PlaywrightApiManager(
     /**
      * Per-thread instance, bound to a container
      */
-    private inner class PlaywrightContainerApiImpl : PlaywrightContainerApi {
+    private inner class PlaywrightApiImpl : PlaywrightApi {
 
         private val playwright = Playwright.create()
         private var chromiumBrowser: Browser? = null

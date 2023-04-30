@@ -7,17 +7,17 @@ import kotlin.reflect.KClass
 
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
-annotation class PlaywrightTestcontainersConfig(val configurer: KClass<out PlaywrightTestcontainersConfigurer>)
+annotation class PlaywrightConfig(val configurer: KClass<out PlaywrightConfigurer>)
 
-interface PlaywrightTestcontainersConfigurer {
+interface PlaywrightConfigurer {
 
-    fun provideContainer(): PlaywrightContainer = PlaywrightContainer()
+    fun createContainer(): PlaywrightContainer = PlaywrightContainer()
 
     fun setupContainer(container: PlaywrightContainer) {}
 
     fun createBrowserContextOptions(): NewContextOptions? = null
 
-    fun configureBrowserContext(context: BrowserContext) {}
+    fun setupBrowserContext(context: BrowserContext) {}
 
-    fun getPlaywrightContainerApiProvider(): PlaywrightContainerApiProvider? = null
+    fun createPlaywrightApiProvider(): PlaywrightApiProvider? = null
 }

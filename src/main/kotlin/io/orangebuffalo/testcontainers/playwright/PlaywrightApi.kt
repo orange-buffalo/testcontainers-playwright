@@ -3,7 +3,7 @@ package io.orangebuffalo.testcontainers.playwright
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.Selectors
 
-interface PlaywrightContainerApi {
+interface PlaywrightApi {
 
     fun chromium(): Browser
 

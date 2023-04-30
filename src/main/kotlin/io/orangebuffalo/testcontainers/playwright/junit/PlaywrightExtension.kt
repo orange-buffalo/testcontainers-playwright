@@ -3,7 +3,7 @@ package io.orangebuffalo.testcontainers.playwright.junit
 import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Page
 import io.orangebuffalo.testcontainers.playwright.PlaywrightContainer
-import io.orangebuffalo.testcontainers.playwright.PlaywrightContainerApi
+import io.orangebuffalo.testcontainers.playwright.PlaywrightApi
 import org.junit.jupiter.api.extension.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
@@ -13,7 +13,7 @@ private var containers = ConcurrentHashMap<String?, PlaywrightContainer>()
 private val extensionNamespace = ExtensionContext.Namespace.create("io.orangebuffalo.testcontainers.playwright")
 private const val BROWSER_CONTEXTS_KEY = "browserContexts"
 
-class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEachCallback {
+class PlaywrightExtension : Extension, ParameterResolver, AfterEachCallback {
     override fun supportsParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Boolean {
         return isContainerApiParameter(parameterContext)
                 || isBrowserContextParameter(parameterContext)
@@ -46,7 +46,7 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
     private fun createBrowserContext(
         parameterContext: ParameterContext,
         extensionContext: ExtensionContext,
-        containerApi: PlaywrightContainerApi,
+        containerApi: PlaywrightApi,
     ): BrowserContext {
         val configurer = extensionContext.getConfig().instantiateConfigurer()
         val context = if (hasAnnotation(parameterContext, extensionContext, RequiresWebkit::class)) {
@@ -57,7 +57,7 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
             containerApi.chromium().newContext(configurer?.createBrowserContextOptions())
         }
 
-        configurer?.configureBrowserContext(context)
+        configurer?.setupBrowserContext(context)
         extensionContext.getBrowserContexts().add(context)
 
         return context
@@ -65,7 +65,7 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
 
     private fun isContainerApiParameter(parameterContext: ParameterContext): Boolean {
         val parameterClass = parameterContext.parameter.type
-        return PlaywrightContainerApi::class.java == parameterClass
+        return PlaywrightApi::class.java == parameterClass
     }
 
     private fun isBrowserContextParameter(parameterContext: ParameterContext): Boolean {
@@ -103,18 +103,18 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
             } as MutableList<BrowserContext>
     }
 
-    private fun getOrCreateContainerApi(extensionContext: ExtensionContext): PlaywrightContainerApi {
+    private fun getOrCreateContainerApi(extensionContext: ExtensionContext): PlaywrightApi {
         val config = extensionContext.getConfig()
         val configurer = config.instantiateConfigurer()
-        val playwrightContainerApiProvider = configurer?.getPlaywrightContainerApiProvider()
+        val playwrightContainerApiProvider = configurer?.createPlaywrightApiProvider()
         if (playwrightContainerApiProvider != null) {
-            return playwrightContainerApiProvider.getOrCreatePlaywrightContainerApiForCurrentThread()
+            return playwrightContainerApiProvider.getOrCreatePlaywrightApiForCurrentThread()
         }
 
         val container = containers.computeIfAbsent(config.containerStorageKey) { configKey ->
             log.info { "Starting Playwright container for $configKey config" }
 
-            val container = configurer?.provideContainer() ?: PlaywrightContainer()
+            val container = configurer?.createContainer() ?: PlaywrightContainer()
             container
                 .withLogConsumer {
                     log.debug { "[CONTAINER] ${it.utf8String}" }
@@ -129,11 +129,11 @@ class PlaywrightTestcontainersExtension : Extension, ParameterResolver, AfterEac
     }
 }
 
-private fun ExtensionContext.getConfig() = getAnnotation(requiredTestClass, PlaywrightTestcontainersConfig::class)
+private fun ExtensionContext.getConfig() = getAnnotation(requiredTestClass, PlaywrightConfig::class)
 
-private val PlaywrightTestcontainersConfig?.containerStorageKey: String
+private val PlaywrightConfig?.containerStorageKey: String
     get() = this?.configurer?.qualifiedName ?: "default"
 
-private fun PlaywrightTestcontainersConfig?.instantiateConfigurer(): PlaywrightTestcontainersConfigurer? {
+private fun PlaywrightConfig?.instantiateConfigurer(): PlaywrightConfigurer? {
     return this?.configurer?.java?.getDeclaredConstructor()?.newInstance()
 }
