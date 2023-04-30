@@ -13,6 +13,23 @@ private var containers = ConcurrentHashMap<String?, PlaywrightContainer>()
 private val extensionNamespace = ExtensionContext.Namespace.create("io.orangebuffalo.testcontainers.playwright")
 private const val BROWSER_CONTEXTS_KEY = "browserContexts"
 
+/**
+ * JUnit 5 extension that manages [PlaywrightContainer] and provides Playwright primitives bound to its browsers.
+ *
+ * This extension can be configured via [PlaywrightConfig] annotation (or its meta-annotation). A single (VM-wide)
+ * container is created per each configuration. If no configuration is provided, a default one is used.
+ *
+ * Extensions allows to inject [PlaywrightApi], [BrowserContext] and [Page] instances into test methods and manages
+ * their lifecycle (e.g. cleans up browser contexts after each test).
+ *
+ * When [PlaywrightApi] is injected, test authors have full controls over the browsers and can use them in any way.
+ * They are also responsible for closing any resources they create (e.g. browser contexts and/or pages).
+ *
+ * When [BrowserContext] or [Page] is injected, the extension will close it after each test. Test authors can
+ * control which browser these objects are bound to by annotating test methods with [RequiresChromium],
+ * [RequiresFirefox] or [RequiresWebkit] annotation. The annotations can be applied to parameter, test method or
+ * test class, both directly and via their meta-annotations. If not annotated, Chromium will be used by default.
+ */
 class PlaywrightExtension : Extension, ParameterResolver, AfterEachCallback {
     override fun supportsParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Boolean {
         return isContainerApiParameter(parameterContext)
@@ -125,7 +142,7 @@ class PlaywrightExtension : Extension, ParameterResolver, AfterEachCallback {
                     log.info { "Playwright container started" }
                 }
         }
-        return container.getPlaywrightContainerApi()
+        return container.getPlaywrightApi()
     }
 }
 

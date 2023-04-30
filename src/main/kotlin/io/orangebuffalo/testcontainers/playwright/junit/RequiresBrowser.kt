@@ -1,5 +1,8 @@
 package io.orangebuffalo.testcontainers.playwright.junit
 
+/**
+ * Instructs [PlaywrightExtension] to inject Playwright API instance that are bound to Chromium.
+ */
 @Target(
     AnnotationTarget.VALUE_PARAMETER,
     AnnotationTarget.FUNCTION,
@@ -9,6 +12,9 @@ package io.orangebuffalo.testcontainers.playwright.junit
 @Retention(AnnotationRetention.RUNTIME)
 annotation class RequiresChromium
 
+/**
+ * Instructs [PlaywrightExtension] to inject Playwright API instance that are bound to Firefox.
+ */
 @Target(
     AnnotationTarget.VALUE_PARAMETER,
     AnnotationTarget.FUNCTION,
@@ -18,6 +24,9 @@ annotation class RequiresChromium
 @Retention(AnnotationRetention.RUNTIME)
 annotation class RequiresFirefox
 
+/**
+ * Instructs [PlaywrightExtension] to inject Playwright API instance that are bound to WebKit.
+ */
 @Target(
     AnnotationTarget.VALUE_PARAMETER,
     AnnotationTarget.FUNCTION,

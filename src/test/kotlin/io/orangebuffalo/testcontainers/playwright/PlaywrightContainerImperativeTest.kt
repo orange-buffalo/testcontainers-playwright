@@ -9,7 +9,7 @@ internal class PlaywrightContainerImperativeTest {
 
     @Test
     fun shouldProvideValidChromiumBrowser() = withContainer {
-        getPlaywrightContainerApi()
+        getPlaywrightApi()
             .chromium()
             .openAndVerifyTestPage()
             .shouldRunInChromium()
@@ -17,7 +17,7 @@ internal class PlaywrightContainerImperativeTest {
 
     @Test
     fun shouldProvideValidFirefoxBrowser() = withContainer {
-        getPlaywrightContainerApi()
+        getPlaywrightApi()
             .firefox()
             .openAndVerifyTestPage()
             .shouldRunInFirefox()
@@ -25,7 +25,7 @@ internal class PlaywrightContainerImperativeTest {
 
     @Test
     fun shouldProvideValidWebkitBrowser() = withContainer {
-        getPlaywrightContainerApi()
+        getPlaywrightApi()
             .webkit()
             .openAndVerifyTestPage()
             .shouldRunInWebkit()

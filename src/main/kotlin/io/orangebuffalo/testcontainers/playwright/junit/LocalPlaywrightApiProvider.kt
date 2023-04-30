@@ -8,7 +8,8 @@ import io.orangebuffalo.testcontainers.playwright.PlaywrightApi
 import io.orangebuffalo.testcontainers.playwright.safeClose
 
 /**
- * Manages instances of [PlaywrightApi] per thread, bound to a particular container.
+ * [PlaywrightApiProvider] that creates local browser instances, bypassing Docker containers. Runs browsers
+ * in non-headless mode.
  */
 class LocalPlaywrightApiProvider : PlaywrightApiProvider {
 
@@ -22,9 +23,6 @@ class LocalPlaywrightApiProvider : PlaywrightApiProvider {
 
     override fun getOrCreatePlaywrightApiForCurrentThread(): PlaywrightApi = playwrightApis.get()
 
-    /**
-     * Per-thread instance, bound to a container
-     */
     private class LocalPlaywrightApiImpl : PlaywrightApi {
 
         private val playwright = Playwright.create()
