@@ -2,10 +2,27 @@ plugins {
     kotlin("jvm") version "1.8.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
     `maven-publish`
+    id("me.qoomon.git-versioning") version "6.4.2"
 }
 
 group = "io.orange-buffalo"
-version = "1.0-SNAPSHOT"
+version = "0.0.0-SNAPSHOT"
+gitVersioning.apply {
+    refs {
+        branch("master") {
+            version = "\${describe.tag.version}-SNAPSHOT"
+        }
+        branch(".+") {
+            version = "\${ref}-SNAPSHOT"
+        }
+        tag("v(?<version>.*)") {
+            version = "\${ref.version}"
+        }
+    }
+    rev {
+        version = "\${commit}"
+    }
+}
 
 repositories {
     mavenCentral()
