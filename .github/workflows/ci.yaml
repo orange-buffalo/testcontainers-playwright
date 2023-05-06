@@ -1,0 +1,49 @@
+name: "Continuous Integration"
+
+on: [push]
+
+jobs:
+  build:
+    name: "Build and Tests"
+    runs-on: ubuntu-22.04
+
+    steps:
+
+    - name: "Checkout"
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: "Set up JDK"
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'corretto'
+        java-version: '17'
+
+    - name: Build Cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+          ~/.cache/google-cloud-tools-java/jib
+        # workaround for https://github.com/actions/cache/issues/342
+        # generate new key for each build to force cache push
+        key: build-cache-${{ github.run_id }}
+        # but use restore key to restore the latest pushed cache
+        restore-keys: |
+          build-cache-
+
+    - name: "Build"
+      run: ./gradlew publishToMavenLocal --scan --console=plain --info --build-cache
+
+    - name: "Test"
+      run: ./gradlew check --scan --console=plain --info --build-cache
+
+    - name: "Save Tests Results"
+      uses: actions/upload-artifact@v3
+      if: ${{ failure() }}
+      with:
+        name: Tests Results
+        path: "**/build/reports/tests/**/"
+        if-no-files-found: "ignore"

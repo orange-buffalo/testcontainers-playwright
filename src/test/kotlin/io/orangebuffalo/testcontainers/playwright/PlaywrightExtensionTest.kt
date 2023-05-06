@@ -496,8 +496,8 @@ internal class PlaywrightExtensionTest {
         fun `for page`(page: Page) = executeTest(page)
 
         private fun executeTest(page: Page) {
-            page.navigateAndVerify()
             val exception = shouldThrow<TimeoutError> {
+                page.navigateAndVerify()
                 page.getByLabel("Non existent").blur()
             }
             exception.message.shouldContain("Timeout 20ms exceeded")
