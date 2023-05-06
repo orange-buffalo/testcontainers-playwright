@@ -115,6 +115,39 @@ class MyTests {
     }
 }
 ```
+Please note that the extension is only responsible for managing the lifecycle of the injected primitives. 
+If you create any derived instances from these primitives, it is your responsibility to close them within the test. 
+The extension will close the instances it provides but not any derived ones.
+
+Here's an example demonstrating the injection of `PlaywrightApi` and `BrowserContext`, as well as the creation 
+and manual management of derived instances:
+
+```java
+import io.orangebuffalo.testcontainers.playwright.junit.*;
+import com.microsoft.playwright.*;
+
+@ExtendWith(PlaywrightExtension.class)
+class MyTests {
+
+    @Test
+    void testWithInjectedApi(PlaywrightApi playwrightApi) {
+        try (BrowserContext derivedContext = playwrightApi.chromium().newContext();
+             Page derivedPage = derivedContext.newPage()) {
+            // Perform your test actions
+        }
+    }
+
+    @Test
+    void testWithInjectedBrowserContext(BrowserContext browserContext) {
+        try (Page derivedPage = browserContext.newPage()) {
+            // Perform your test actions
+        }
+    }
+}
+```
+In this example, the derived instances `derivedPage` and `derivedContext` are created from the injected primitives. 
+These instances must be closed manually within the test using a try-with-resources block, 
+as the extension will not manage their lifecycle.
 
 #### Configuring the Extension
 The extension can be configured using the `@PlaywrightConfig` annotation and the `PlaywrightConfigurer` interface. 
