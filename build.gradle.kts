@@ -1,7 +1,9 @@
+import org.jetbrains.kotlinx.publisher.githubRepo
+
 plugins {
     kotlin("jvm") version "1.8.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
-    `maven-publish`
+    id("org.jetbrains.kotlin.libs.publisher") version "1.8.10-dev-40"
     id("me.qoomon.git-versioning") version "6.4.2"
 }
 
@@ -55,14 +57,14 @@ kotlin {
     jvmToolchain(11)
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = project.group.toString()
-            artifactId = project.name
-            version = project.version.toString()
+kotlinPublications {
+    signingCredentials(
 
-            from(components["kotlin"])
-        }
+    )
+    pom {
+        githubRepo("orange-buffalo", "testcontainers-playwright")
+        description.set("Testcontainers-based container for Playwright")
+    }
+    publication {
     }
 }
