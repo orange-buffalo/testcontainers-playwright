@@ -18,14 +18,18 @@ private const val firefoxPort = 4445
 private const val webkitPort = 4446
 
 /**
- * Testcontainers-based container for Playwright that allows to run the tests without installing Playwright browser locally.
+ * Testcontainers-based container for Playwright that enables running tests without installing
+ * Playwright browsers locally.
  *
- * This container manages a single instance of each supported browser (Chromium, Firefox, Webkit). It exposes API
- * to get the [com.microsoft.playwright.Browser] instances that are connected to the browsers running in the container.
- * The browsers are started lazily on first request to the API.
+ * This container manages a single instance of each supported browser (Chromium, Firefox, WebKit) and
+ * exposes an API to obtain the [com.microsoft.playwright.Browser] instances connected to the browsers
+ * running inside the container. The browsers are started lazily upon first request to the API.
  *
- * This API is considered low-level. If testing with JUnit 5, we recommend using
- * [io.orangebuffalo.testcontainers.playwright.junit.PlaywrightExtension] that provides additional features on top.
+ * This API is considered low-level. If testing with JUnit 5, it is recommended to use
+ * [io.orangebuffalo.testcontainers.playwright.junit.PlaywrightExtension] for additional features.
+ *
+ * @property customImage Optional custom Docker image for the container. If not provided, a default image
+ *                       compatible with the Playwright version on the classpath will be used.
  */
 class PlaywrightContainer(private val customImage: DockerImageName? = null) :
     GenericContainer<PlaywrightContainer>(DockerImageName.parse("ghcr.io/orange-buffalo/testcontainers-playwright:1.31")) {

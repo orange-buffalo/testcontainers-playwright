@@ -4,13 +4,15 @@ import com.microsoft.playwright.Browser
 import com.microsoft.playwright.Selectors
 
 /**
- * Provides access to Playwright API.
+ * Provides access to the Playwright API for browser automation and testing.
  *
- * Essentially is a wrapper around [com.microsoft.playwright.Playwright] that is compatible with the
- * underlying browser lifecycle.
+ * This interface serves as a wrapper around [com.microsoft.playwright.Playwright]
+ * that ensures compatibility with the underlying browser lifecycle. It provides methods to access
+ * Chromium, Firefox, and WebKit browser instances, as well as a selector API.
  *
- * Instances are not thread-safe. Each thread should have its own instance. This is handled by [PlaywrightContainer]
- * if this API is accessed via [PlaywrightContainer.getPlaywrightApi].
+ * Instances of this interface are not thread-safe. Each thread should have its own instance. This
+ * is handled automatically when accessing the API via [PlaywrightContainer.getPlaywrightApi]
+ * or corresponding test framework extension.
  */
 interface PlaywrightApi {
 
