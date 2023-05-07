@@ -1,8 +1,11 @@
 plugins {
     kotlin("jvm") version "1.8.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
-    `maven-publish`
     id("me.qoomon.git-versioning") version "6.4.2"
+    id("org.jetbrains.dokka") version "1.8.10"
+    `maven-publish`
+    signing
+    id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
 }
 
 group = "io.orange-buffalo"
@@ -55,6 +58,19 @@ kotlin {
     jvmToolchain(11)
 }
 
+java {
+    withSourcesJar()
+}
+
+val docsJar = tasks.register<Jar>("docsJar") {
+    archiveClassifier.set("javadoc")
+    from(tasks.named("dokkaJavadoc"))
+}
+
+artifacts {
+    archives(docsJar)
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
@@ -63,6 +79,55 @@ publishing {
             version = project.version.toString()
 
             from(components["kotlin"])
+            artifacts {
+                artifact(tasks.named("sourcesJar"))
+                artifact(docsJar)
+            }
+
+            pom {
+                name.set("testcontainers-playwright")
+                description.set("Testcontainers-based container for Playwright")
+                url.set("https://github.com/orange-buffalo/kiosab")
+                packaging = "jar"
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("orange-buffalo")
+                        name.set("Bogdan Ilchyshyn")
+                        email.set("orange-buffalo@users.noreply.github.com")
+                    }
+                }
+                scm {
+                    connection.set("scm:git@github.com:orange-buffalo/testcontainers-playwright.git")
+                    developerConnection.set("scm:git@github.com:orange-buffalo/testcontainers-playwright.git")
+                    url.set("https://github.com/orange-buffalo/testcontainers-playwright")
+                }
+            }
         }
     }
+}
+
+nexusPublishing {
+    this.repositories {
+        sonatype {
+            val ossrhUser: String? by project
+            val ossrhPassword: String? by project
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots"))
+            username.set(ossrhUser)
+            password.set(ossrhPassword)
+        }
+    }
+}
+
+signing {
+    val ossrhSigningKey: String? by project
+    val ossrhSigningPassword: String? by project
+    useInMemoryPgpKeys(ossrhSigningKey, ossrhSigningPassword)
+    sign(publishing.publications["maven"])
 }

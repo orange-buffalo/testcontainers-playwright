@@ -35,10 +35,18 @@ jobs:
           build-cache-
 
     - name: "Build"
-      run: ./gradlew publishToMavenLocal --scan --console=plain --info --build-cache
+      run: ./gradlew assemble --scan --console=plain --info --build-cache
 
     - name: "Test"
       run: ./gradlew check --scan --console=plain --info --build-cache
+
+    - name: "Publish snapshot"
+      run: ./gradlew publish --scan --console=plain --info --build-cache
+      env:
+        ORG_GRADLE_PROJECT_ossrhSigningKey: "${{ secrets.ossrhSigningKey }}"
+        ORG_GRADLE_PROJECT_ossrhSigningPassword: "${{ secrets.ossrhSigningPassword }}"
+        ORG_GRADLE_PROJECT_ossrhPassword: "${{ secrets.ossrhPassword }}"
+        ORG_GRADLE_PROJECT_ossrhUser: "${{ secrets.ossrhUser }}"
 
     - name: "Save Tests Results"
       uses: actions/upload-artifact@v3
