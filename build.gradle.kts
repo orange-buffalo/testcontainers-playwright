@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     kotlin("jvm") version "1.8.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
@@ -6,6 +8,7 @@ plugins {
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "io.orange-buffalo"
@@ -32,11 +35,10 @@ repositories {
 }
 
 dependencies {
-    api("org.testcontainers:testcontainers:1.18.0")
-
     implementation("io.github.microutils:kotlin-logging:3.0.5")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
+    compileOnly("org.testcontainers:testcontainers:1.18.0")
     compileOnly("com.microsoft.playwright:playwright:1.32.0")
     compileOnly("org.junit.jupiter:junit-jupiter-api:5.9.2")
 
@@ -62,6 +64,12 @@ java {
     withSourcesJar()
 }
 
+tasks.named("compileKotlin", org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask::class.java) {
+    compilerOptions {
+        freeCompilerArgs.add("-Xjvm-default=all")
+    }
+}
+
 val docsJar = tasks.register<Jar>("docsJar") {
     archiveClassifier.set("javadoc")
     from(tasks.named("dokkaJavadoc"))
@@ -71,6 +79,26 @@ artifacts {
     archives(docsJar)
 }
 
+tasks.named<ShadowJar>("shadowJar") {
+    // we cannot shadow slf4j as it won't integrate with client's logging
+    relocate("org.jetbrains", "io.orangebuffalo.testcontainers.playwright.shadow.org.jetbrains")
+    relocate("org.intellij", "io.orangebuffalo.testcontainers.playwright.shadow.org.intellij")
+    relocate("kotlin", "io.orangebuffalo.testcontainers.playwright.shadow.kotlin")
+    relocate("kotlinx", "io.orangebuffalo.testcontainers.playwright.shadow.kotlinx")
+    relocate("mu", "io.orangebuffalo.testcontainers.playwright.shadow.mu")
+
+    dependencies {
+        exclude(dependency("org.slf4j:slf4j-api:.*"))
+    }
+
+    // remove top-level unshadowed meta-data to avoid conflicts with client code
+    exclude("META-INF/kotlin*.kotlin_module")
+    exclude("META-INF/com.android.tools/**")
+    exclude("META-INF/maven/**")
+    exclude("META-INF/proguard/**")
+    exclude("META-INF/versions/**")
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
@@ -78,7 +106,7 @@ publishing {
             artifactId = project.name
             version = project.version.toString()
 
-            from(components["kotlin"])
+            project.shadow.component(this)
             artifacts {
                 artifact(tasks.named("sourcesJar"))
                 artifact(docsJar)
@@ -126,6 +154,10 @@ nexusPublishing {
 }
 
 signing {
+    // provide this property (-Psigning.skip=true) to disable signing and deploy snapshots into local repo
+    setRequired({
+        !project.hasProperty("signing.skip")
+    })
     val ossrhSigningKey: String? by project
     val ossrhSigningPassword: String? by project
     useInMemoryPgpKeys(ossrhSigningKey, ossrhSigningPassword)
