@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version to set. If not provided, the current version''s patch version will be incremented.'
+        required: false
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Calculate new version
+        id: calculate_new_version
+        run: |
+          if [[ -n "${{ github.event.inputs.version }}" ]]; then
+            version="${{ github.event.inputs.version }}"
+            if [[ ! $version == v* ]]; then
+              version="v$version"
+            fi
+          else
+            latest_tag=$(git describe --tags --match "v*" --abbrev=0 $(git rev-list --tags --max-count=1))
+            version=$(echo $latest_tag | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+          fi
+          echo "::set-output name=version::$version"
+
+      - name: "Create new tag"
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag ${{ steps.calculate_new_version.outputs.version }}
+          git push origin ${{ steps.calculate_new_version.outputs.version }}
+
+      - name: "Build"
+        run: ./gradlew assemble --scan --console=plain --info --build-cache
+
+      - name: "Test"
+        run: ./gradlew check --scan --console=plain --info --build-cache
+
+      - name: "Prepare GitHub release"
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          draft: true
+          prerelease: false
+
+      - name: "Publish release"
+        run: ./gradlew publish --scan --console=plain --info --build-cache
+        env:
+          ORG_GRADLE_PROJECT_ossrhSigningKey: "${{ secrets.ossrhSigningKey }}"
+          ORG_GRADLE_PROJECT_ossrhSigningPassword: "${{ secrets.ossrhSigningPassword }}"
+          ORG_GRADLE_PROJECT_ossrhPassword: "${{ secrets.ossrhPassword }}"
+          ORG_GRADLE_PROJECT_ossrhUser: "${{ secrets.ossrhUser }}"
