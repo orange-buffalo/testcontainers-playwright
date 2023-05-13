@@ -14,45 +14,87 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+
+      - name: "Set up JDK"
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+
+      - name: Build Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.cache/google-cloud-tools-java/jib
+          # workaround for https://github.com/actions/cache/issues/342
+          # generate new key for each build to force cache push
+          key: build-cache-${{ github.run_id }}
+          # but use restore key to restore the latest pushed cache
+          restore-keys: |
+            build-cache-
 
       - name: Calculate new version
         id: calculate_new_version
         run: |
+          latest_tag=$(git describe --tags --match "v*" --abbrev=0 $(git rev-list --tags --max-count=1))
           if [[ -n "${{ github.event.inputs.version }}" ]]; then
             version="${{ github.event.inputs.version }}"
             if [[ ! $version == v* ]]; then
               version="v$version"
             fi
           else
-            latest_tag=$(git describe --tags --match "v*" --abbrev=0 $(git rev-list --tags --max-count=1))
             version=$(echo $latest_tag | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
           fi
-          echo "::set-output name=version::$version"
+          echo "previous_version=$latest_tag" >> "$GITHUB_OUTPUT"
+          echo "new_version=$version" >> "$GITHUB_OUTPUT"
 
-      - name: "Create new tag"
+      - name: Create tag
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git tag ${{ steps.calculate_new_version.outputs.version }}
-          git push origin ${{ steps.calculate_new_version.outputs.version }}
+          gh_actor_profile="$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/users/${GITHUB_ACTOR}")"
+          git config --global user.name "$(printf '%s' "$gh_actor_profile" | jq -r .name)"
+          git config --global user.email "$(printf '%s' "$gh_actor_profile" | jq -r .email)"
+          git status
+          git tag "${{ steps.calculate_new_version.outputs.new_version }}"
 
-      - name: "Build"
+      - name: Build
+        env:
+          VERSIONING_GIT_REF: "refs/tags/${{ steps.calculate_new_version.outputs.new_version }}"
         run: ./gradlew assemble --scan --console=plain --info --build-cache
 
-      - name: "Test"
+      - name: Test
+        env:
+          VERSIONING_GIT_REF: "refs/tags/${{ steps.calculate_new_version.outputs.new_version }}"
         run: ./gradlew check --scan --console=plain --info --build-cache
 
-      - name: "Prepare GitHub release"
-        uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          draft: true
-          prerelease: false
+      - name: "Push Version Tag"
+        run: |
+          echo "Pushing tags to remote"
+          remote_repo="https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
+          git push "${remote_repo}" --tags
+          echo -e "\nPushed"
 
-      - name: "Publish release"
-        run: ./gradlew publish --scan --console=plain --info --build-cache
+      - name: Create changelog text
+        id: changelog
+        uses: loopwerk/tag-changelog@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.calculate_new_version.outputs.new_version }}
+          body: ${{ steps.changelog.outputs.changes }}
+          draft: true
+
+      - name: Publish release
         env:
+          VERSIONING_GIT_REF: "refs/tags/${{ steps.calculate_new_version.outputs.new_version }}"
           ORG_GRADLE_PROJECT_ossrhSigningKey: "${{ secrets.ossrhSigningKey }}"
           ORG_GRADLE_PROJECT_ossrhSigningPassword: "${{ secrets.ossrhSigningPassword }}"
           ORG_GRADLE_PROJECT_ossrhPassword: "${{ secrets.ossrhPassword }}"
           ORG_GRADLE_PROJECT_ossrhUser: "${{ secrets.ossrhUser }}"
+        run: ./gradlew publish --scan --console=plain --info --build-cache
