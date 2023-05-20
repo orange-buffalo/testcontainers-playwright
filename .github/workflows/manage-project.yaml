@@ -1,0 +1,36 @@
+name: Manage Project
+
+on:
+  issues:
+    types: [ opened, reopened ]
+  pull_request:
+    types: [ opened, reopened ]
+env:
+  MY_GITHUB_TOKEN: ${{ secrets.MANAGE_PROJECTS_WF_TOKEN }}
+
+jobs:
+  manage_project:
+    runs-on: ubuntu-latest
+    name: Manage Project
+    steps:
+      - name: Add new user issue into the project
+        uses: srggrs/assign-one-project-github-action@1.2.1
+        if: github.event_name == 'issues'
+        with:
+          project: 'https://github.com/users/orange-buffalo/projects/6'
+          column_name: 'New'
+
+      - name: Add new maintainer issue into the project
+        uses: srggrs/assign-one-project-github-action@1.2.1
+        if: github.event_name == 'issues' && github.actor == 'orange-buffalo'
+        with:
+          project: 'https://github.com/users/orange-buffalo/projects/6'
+          column_name: 'Backlog'
+
+      - name: Add new pull requests into the project
+        uses: alex-page/github-project-automation-plus@v0.8.3
+        if: github.event_name == 'pull_request'
+        with:
+          project: 'testcontainers-playwright'
+          column: 'In Progress'
+          repo-token: ${{ secrets.MANAGE_PROJECTS_WF_TOKEN }}
