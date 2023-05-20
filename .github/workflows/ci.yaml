@@ -41,6 +41,7 @@ jobs:
       run: ./gradlew check --scan --console=plain --info --build-cache
 
     - name: "Publish snapshot"
+      if: ${{ github.actor != 'dependabot[bot]' }}
       run: ./gradlew publish --scan --console=plain --info --build-cache
       env:
         ORG_GRADLE_PROJECT_ossrhSigningKey: "${{ secrets.ossrhSigningKey }}"
