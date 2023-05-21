@@ -35,11 +35,12 @@ repositories {
 }
 
 dependencies {
+    api("org.testcontainers:testcontainers:1.18.1")
+    api("com.microsoft.playwright:playwright:1.32.0")
+
     implementation("io.github.microutils:kotlin-logging:3.0.5")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
-    compileOnly("org.testcontainers:testcontainers:1.18.1")
-    compileOnly("com.microsoft.playwright:playwright:1.32.0")
     compileOnly("org.junit.jupiter:junit-jupiter-api:5.9.2")
 
     testImplementation("io.kotest:kotest-assertions-core:4.0.7")
@@ -115,7 +116,7 @@ publishing {
             pom {
                 name.set("testcontainers-playwright")
                 description.set("Testcontainers-based container for Playwright")
-                url.set("https://github.com/orange-buffalo/kiosab")
+                url.set("https://github.com/orange-buffalo/testcontainers-playwright")
                 packaging = "jar"
                 licenses {
                     license {
@@ -134,6 +135,15 @@ publishing {
                     connection.set("scm:git@github.com:orange-buffalo/testcontainers-playwright.git")
                     developerConnection.set("scm:git@github.com:orange-buffalo/testcontainers-playwright.git")
                     url.set("https://github.com/orange-buffalo/testcontainers-playwright")
+                }
+                withXml {
+                    // shadow plugin is not flexible enough, have to manually craft the dependencies
+                    addDependenciesFromConfiguration(configuration = configurations["api"], scope = "compile")
+                    addDependenciesFromConfiguration(
+                        configuration = configurations["compileOnly"],
+                        scope = "provided",
+                        optional = true
+                    )
                 }
             }
         }
