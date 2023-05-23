@@ -39,7 +39,7 @@ dependencies {
     api("com.microsoft.playwright:playwright:1.32.0")
 
     implementation("io.github.microutils:kotlin-logging:3.0.5")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
     compileOnly("org.junit.jupiter:junit-jupiter-api:5.9.3")
 
