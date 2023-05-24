@@ -35,14 +35,14 @@ jobs:
           build-cache-
 
     - name: "Build"
-      run: ./gradlew assemble --scan --console=plain --info --build-cache
+      run: ./gradlew assemble --scan --console=plain --build-cache
 
     - name: "Test"
-      run: ./gradlew check --scan --console=plain --info --build-cache
+      run: ./gradlew check --scan --console=plain --build-cache
 
     - name: "Publish snapshot"
       if: ${{ github.actor != 'dependabot[bot]' }}
-      run: ./gradlew publish --scan --console=plain --info --build-cache
+      run: ./gradlew publish --scan --console=plain --build-cache
       env:
         ORG_GRADLE_PROJECT_ossrhSigningKey: "${{ secrets.ossrhSigningKey }}"
         ORG_GRADLE_PROJECT_ossrhSigningPassword: "${{ secrets.ossrhSigningPassword }}"

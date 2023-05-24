@@ -173,3 +173,10 @@ signing {
     useInMemoryPgpKeys(ossrhSigningKey, ossrhSigningPassword)
     sign(publishing.publications["maven"])
 }
+
+gradleEnterprise {
+    buildScan {
+        termsOfServiceUrl = "https://gradle.com/terms-of-service"
+        termsOfServiceAgree = "yes"
+    }
+}
