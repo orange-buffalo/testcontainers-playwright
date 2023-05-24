@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    kotlin("jvm") version "1.8.0"
+    kotlin("jvm") version "1.8.21"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.21"
     id("me.qoomon.git-versioning") version "6.4.2"
     id("org.jetbrains.dokka") version "1.8.10"
