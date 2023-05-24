@@ -36,7 +36,7 @@ repositories {
 
 dependencies {
     api("org.testcontainers:testcontainers:1.18.1")
-    api("com.microsoft.playwright:playwright:1.32.0")
+    api("com.microsoft.playwright:playwright:1.33.0")
 
     implementation("io.github.microutils:kotlin-logging:3.0.5")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
@@ -44,7 +44,7 @@ dependencies {
     compileOnly("org.junit.jupiter:junit-jupiter-api:5.9.3")
 
     testImplementation("io.kotest:kotest-assertions-core:5.6.2")
-    testImplementation("com.microsoft.playwright:playwright:1.32.0")
+    testImplementation("com.microsoft.playwright:playwright:1.33.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
     testImplementation("org.testcontainers:nginx:1.18.1")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
