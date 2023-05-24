@@ -51,6 +51,7 @@ jobs:
           fi
           echo "previous_version=$latest_tag" >> "$GITHUB_OUTPUT"
           echo "new_version=$version" >> "$GITHUB_OUTPUT"
+          echo "new_release=${version#v}" >> "$GITHUB_OUTPUT"
 
       - name: Create tag
         run: |
@@ -63,12 +64,12 @@ jobs:
       - name: Build
         env:
           VERSIONING_GIT_REF: "refs/tags/${{ steps.calculate_new_version.outputs.new_version }}"
-        run: ./gradlew assemble --scan --console=plain --info --build-cache
+        run: ./gradlew assemble --scan --console=plain --build-cache
 
       - name: Test
         env:
           VERSIONING_GIT_REF: "refs/tags/${{ steps.calculate_new_version.outputs.new_version }}"
-        run: ./gradlew check --scan --console=plain --info --build-cache
+        run: ./gradlew check --scan --console=plain --build-cache
 
       - name: "Push Version Tag"
         run: |
@@ -87,6 +88,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.calculate_new_version.outputs.new_version }}
+          name: ${{ steps.calculate_new_version.outputs.new_release }}
           body: ${{ steps.changelog.outputs.changes }}
           draft: true
 
@@ -97,4 +99,4 @@ jobs:
           ORG_GRADLE_PROJECT_ossrhSigningPassword: "${{ secrets.ossrhSigningPassword }}"
           ORG_GRADLE_PROJECT_ossrhPassword: "${{ secrets.ossrhPassword }}"
           ORG_GRADLE_PROJECT_ossrhUser: "${{ secrets.ossrhUser }}"
-        run: ./gradlew publish --scan --console=plain --info --build-cache
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --scan --console=plain --build-cache
