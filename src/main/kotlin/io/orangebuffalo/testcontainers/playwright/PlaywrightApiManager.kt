@@ -31,7 +31,11 @@ internal class PlaywrightApiManager(
      */
     private inner class PlaywrightApiImpl : PlaywrightApi {
 
-        private val playwright = Playwright.create()
+        private val playwright = Playwright.create(
+            Playwright.CreateOptions()
+                // skip browser download as we run against Docker image managed binaries
+                .setEnv(mapOf("PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD" to "1"))
+        )
         private var chromiumBrowser: Browser? = null
         private var firefoxBrowser: Browser? = null
         private var webkitBrowser: Browser? = null
