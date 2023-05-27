@@ -34,12 +34,17 @@ repositories {
     mavenCentral()
 }
 
+// for better control on what we shade, we define private dependencies in a separate configuration;
+// it does not extend anything (unlike "implementation") and so we fully in control of what is included
+val shadowDependencies: Configuration by configurations.creating
+configurations["implementation"].extendsFrom(shadowDependencies)
+
 dependencies {
     api("org.testcontainers:testcontainers:1.18.1")
     api("com.microsoft.playwright:playwright:1.33.0")
 
-    implementation("io.github.microutils:kotlin-logging:3.0.5")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    shadowDependencies("io.github.microutils:kotlin-logging:3.0.5")
+    shadowDependencies("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
     compileOnly("org.junit.jupiter:junit-jupiter-api:5.9.3")
 
@@ -81,7 +86,8 @@ artifacts {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
-    // we cannot shadow slf4j as it won't integrate with client's logging
+    configurations = listOf(shadowDependencies)
+
     relocate("org.jetbrains", "io.orangebuffalo.testcontainers.playwright.shadow.org.jetbrains")
     relocate("org.intellij", "io.orangebuffalo.testcontainers.playwright.shadow.org.intellij")
     relocate("kotlin", "io.orangebuffalo.testcontainers.playwright.shadow.kotlin")
@@ -89,6 +95,7 @@ tasks.named<ShadowJar>("shadowJar") {
     relocate("mu", "io.orangebuffalo.testcontainers.playwright.shadow.mu")
 
     dependencies {
+        // we cannot shadow slf4j as it won't integrate with client's logging
         exclude(dependency("org.slf4j:slf4j-api:.*"))
     }
 
@@ -143,6 +150,13 @@ publishing {
                         configuration = configurations["compileOnly"],
                         scope = "provided",
                         optional = true
+                    )
+
+                    // as we excluded it from shadowing, we have to add it manually to POM dependencies
+                    addDependencyFromConfiguration(
+                        configuration = shadowDependencies,
+                        groupId = "org.slf4j",
+                        artifactId = "slf4j-api"
                     )
                 }
             }
