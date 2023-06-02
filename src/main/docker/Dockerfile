@@ -1,6 +1,7 @@
 ARG PLAYWRIGHT_VERSION=1.32
+ARG BASE_OS=focal
 
-FROM mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}.0-focal
+FROM mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}.0-${BASE_OS}
 
 WORKDIR /app
 
