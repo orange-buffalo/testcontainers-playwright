@@ -4,7 +4,7 @@ plugins {
     kotlin("jvm") version "1.8.21"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.21"
     id("me.qoomon.git-versioning") version "6.4.2"
-    id("org.jetbrains.dokka") version "1.8.10"
+    id("org.jetbrains.dokka") version "1.8.20"
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
