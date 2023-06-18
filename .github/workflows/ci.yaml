@@ -35,10 +35,40 @@ jobs:
           build-cache-
 
     - name: "Build"
-      run: ./gradlew assemble --scan --console=plain --build-cache
+      run: ./gradlew assemble publishToMavenLocal -Psigning.skip=true --scan --console=plain --build-cache
 
     - name: "Test"
       run: ./gradlew check --scan --console=plain --build-cache
+
+    - name: "Extract current version"
+      run: |
+        TCP_VERSION=$(./gradlew -q version)
+        echo "TCP_VERSION=$TCP_VERSION" >> "$GITHUB_ENV"
+
+    - name: Select assembly tests repo branch
+      run: |
+        echo "Check if the branch ${GITHUB_REF##*/} exists in assembly tests repo..."
+        EXISTS=$(git ls-remote --heads https://github.com/orange-buffalo/testcontainers-playwright-assembly-tests.git ${GITHUB_REF##*/})
+        if [[ $EXISTS ]]; then
+          echo "Will be using branch ${GITHUB_REF##*/} from assembly tests repo"
+          echo "ASSEMBLY_TESTS_BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
+        else 
+          echo "Branch ${GITHUB_REF##*/} does not exist in assembly tests repo, using master"
+          echo "ASSEMBLY_TESTS_BRANCH=master" >> $GITHUB_ENV
+        fi
+
+    - name: Checkout assembly tests repo
+      uses: actions/checkout@v3
+      with:
+        repository: orange-buffalo/testcontainers-playwright-assembly-tests
+        ref: ${{ env.ASSEMBLY_TESTS_BRANCH }}
+        fetch-depth: 0
+        path: ./.assembly-tests
+
+    - name: "Test assembly"
+      run: |
+        cd ./.assembly-tests
+        ./gradlew test -PtestcontainersPlaywrightVersion=${{ env.TCP_VERSION }} --build-cache
 
     - name: "Publish snapshot"
       if: ${{ github.actor != 'dependabot[bot]' }}

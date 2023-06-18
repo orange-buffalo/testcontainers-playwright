@@ -42,3 +42,5 @@ bin/
 **/node_modules/
 
 .local/
+
+.assembly-tests/
