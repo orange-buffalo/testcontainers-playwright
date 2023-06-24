@@ -50,6 +50,7 @@ jobs:
             version=$(echo $latest_tag | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
           fi
           echo "previous_version=$latest_tag" >> "$GITHUB_OUTPUT"
+          echo "previous_release=${previous_version#v}" >> "$GITHUB_OUTPUT"
           echo "new_version=$version" >> "$GITHUB_OUTPUT"
           echo "new_release=${version#v}" >> "$GITHUB_OUTPUT"
 
@@ -100,3 +101,13 @@ jobs:
           ORG_GRADLE_PROJECT_ossrhPassword: "${{ secrets.ossrhPassword }}"
           ORG_GRADLE_PROJECT_ossrhUser: "${{ secrets.ossrhUser }}"
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --scan --console=plain --build-cache
+
+      - name: Update README with new version
+        run: |
+          sed -i -e 's/${{ steps.calculate_new_version.outputs.previous_release }}/${{ steps.calculate_new_version.outputs.new_release }}/g' README.MD
+
+      - name: Commit README and push changes
+        run: |
+          git add README.MD
+          git commit -m "Update README.MD with new version"
+          git push
