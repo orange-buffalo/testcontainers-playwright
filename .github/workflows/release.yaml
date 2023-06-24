@@ -50,7 +50,7 @@ jobs:
             version=$(echo $latest_tag | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
           fi
           echo "previous_version=$latest_tag" >> "$GITHUB_OUTPUT"
-          echo "previous_release=${previous_version#v}" >> "$GITHUB_OUTPUT"
+          echo "previous_release=${latest_tag#v}" >> "$GITHUB_OUTPUT"
           echo "new_version=$version" >> "$GITHUB_OUTPUT"
           echo "new_release=${version#v}" >> "$GITHUB_OUTPUT"
 
