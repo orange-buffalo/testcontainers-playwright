@@ -1,5 +1,7 @@
 # Playwright Testcontainers
 
+![](https://maven-badges.herokuapp.com/maven-central/io.orange-buffalo/testcontainers-playwright/badge.svg?style=flat-square)
+
 This library provides a [Testcontainers](https://www.testcontainers.org/)-based container for 
 [Playwright](https://playwright.dev/java/) that enables running 
 browser automation and testing without installing Playwright browsers locally.
@@ -10,6 +12,7 @@ extension for seamless integration with your tests.
 
 - [Key Features](#key-features)
 - [Limitations](#limitations)
+- [Compatibility](#compatibility)
 - [Usage](#usage)
   - [Core API](#core-api)
   - [Using container directly](#using-container-directly)
@@ -45,9 +48,29 @@ This library has a few limitations that you should be aware of:
 
 Please consider these limitations when deciding whether this library is suitable for your testing needs.
 
+## Compatibility
+
+* Playwright 1.26.0+
+* Testcontainers 1.17.0+
+* Java 11+
+
 ## Usage
 
-To use this library, you'll need to add it as a dependency to your project. 
+To use this library, you'll need to add it as a dependency to your project.
+
+Maven:
+```xml
+<dependency>
+    <groupId>io.orange-buffalo</groupId>
+    <artifactId>testcontainers-playwright</artifactId>
+    <scope>test</scope>
+    <version>0.10.3</version>
+</dependency>
+```
+Gradle:
+```kotlin
+testImplementation("io.orange-buffalo:testcontainers-playwright:0.10.3")
+```
 
 Then, you can create a `PlaywrightContainer` instance and use the provided API to access the browser instances.
 
