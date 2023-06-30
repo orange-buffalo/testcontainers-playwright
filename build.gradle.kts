@@ -42,6 +42,7 @@ configurations["implementation"].extendsFrom(shadowDependencies)
 dependencies {
     api("org.testcontainers:testcontainers:1.18.3")
     api("com.microsoft.playwright:playwright:1.35.1")
+    api("org.jetbrains.kotlin:kotlin-stdlib:1.7.22")
 
     shadowDependencies("io.github.microutils:kotlin-logging:3.0.5")
     shadowDependencies("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
@@ -90,7 +91,6 @@ tasks.named<ShadowJar>("shadowJar") {
 
     relocate("org.jetbrains", "io.orangebuffalo.testcontainers.playwright.shadow.org.jetbrains")
     relocate("org.intellij", "io.orangebuffalo.testcontainers.playwright.shadow.org.intellij")
-    relocate("kotlin", "io.orangebuffalo.testcontainers.playwright.shadow.kotlin")
     relocate("kotlinx", "io.orangebuffalo.testcontainers.playwright.shadow.kotlinx")
     relocate("mu", "io.orangebuffalo.testcontainers.playwright.shadow.mu")
 
