@@ -2,7 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     kotlin("jvm") version "1.7.22"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.22"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
     id("me.qoomon.git-versioning") version "6.4.2"
     id("org.jetbrains.dokka") version "1.8.20"
     `maven-publish`
