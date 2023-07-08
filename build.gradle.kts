@@ -97,6 +97,7 @@ tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         // we cannot shadow slf4j as it won't integrate with client's logging
         exclude(dependency("org.slf4j:slf4j-api:.*"))
+        exclude(dependency("org.jetbrains.kotlin:.*:.*"))
     }
 
     // remove top-level unshadowed meta-data to avoid conflicts with client code
