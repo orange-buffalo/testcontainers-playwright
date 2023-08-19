@@ -106,10 +106,14 @@ jobs:
         run: |
           sed -i -e 's/${{ steps.calculate_new_version.outputs.previous_release }}/${{ steps.calculate_new_version.outputs.new_release }}/g' README.MD
 
-      - name: Commit README and push changes
+      - name: Commit README with new version
         run: |
           echo "Committing new version to README.MD"
           git add README.MD
           git commit -m "chore: Update README.MD with new version"
-          remote_repo="https://${{ secrets.MASTER_ACTOR }}:${{ secrets.MASTER_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
-          git push "${remote_repo}"
+
+      - name: Push README with new version
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.secrets.MASTER_TOKEN }}
+          branch: ${{ github.ref }}
