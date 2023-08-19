@@ -108,6 +108,8 @@ jobs:
 
       - name: Commit README and push changes
         run: |
+          echo "Committing new version to README.MD"
           git add README.MD
-          git commit -m "Update README.MD with new version"
-          git push
+          git commit -m "chore: Update README.MD with new version"
+          remote_repo="https://${{ secrets.MASTER_ACTOR }}:${{ secrets.MASTER_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
+          git push "${remote_repo}"
