@@ -49,7 +49,7 @@ dependencies {
 
     compileOnly("org.junit.jupiter:junit-jupiter-api:5.10.0")
 
-    testImplementation("io.kotest:kotest-assertions-core:5.6.2")
+    testImplementation("io.kotest:kotest-assertions-core:5.7.1")
     testImplementation("com.microsoft.playwright:playwright:1.37.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testImplementation("org.testcontainers:nginx:1.19.0")
