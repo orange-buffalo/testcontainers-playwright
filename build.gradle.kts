@@ -45,7 +45,7 @@ dependencies {
     api("org.jetbrains.kotlin:kotlin-stdlib:1.7.22")
 
     shadowDependencies("io.github.microutils:kotlin-logging:3.0.5")
-    shadowDependencies("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    shadowDependencies("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
     compileOnly("org.junit.jupiter:junit-jupiter-api:5.10.0")
 
