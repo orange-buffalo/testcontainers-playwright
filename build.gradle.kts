@@ -40,7 +40,7 @@ val shadowDependencies: Configuration by configurations.creating
 configurations["implementation"].extendsFrom(shadowDependencies)
 
 dependencies {
-    api("org.testcontainers:testcontainers:1.19.0")
+    api("org.testcontainers:testcontainers:1.19.1")
     api("com.microsoft.playwright:playwright:1.38.0")
     api("org.jetbrains.kotlin:kotlin-stdlib:1.7.22")
 
