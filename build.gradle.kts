@@ -52,7 +52,7 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:5.7.2")
     testImplementation("com.microsoft.playwright:playwright:1.38.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
-    testImplementation("org.testcontainers:nginx:1.19.0")
+    testImplementation("org.testcontainers:nginx:1.19.1")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
