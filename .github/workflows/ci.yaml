@@ -80,7 +80,7 @@ jobs:
         ORG_GRADLE_PROJECT_ossrhUser: "${{ secrets.ossrhUser }}"
 
     - name: "Save Tests Results"
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ failure() }}
       with:
         name: Tests Results
