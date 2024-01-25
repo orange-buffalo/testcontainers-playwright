@@ -256,3 +256,11 @@ allowing you to visually see the browser actions during test execution.
 
 Please refer to the provided code examples for a more in-depth understanding 
 of the available API and configuration options.
+
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](docs/CONTRIBUTING.md) for details.
+
+## License
+
+This project is licensed under the [Apache License, Version 2.0](LICENSE).
