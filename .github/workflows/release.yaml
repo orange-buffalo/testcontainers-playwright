@@ -115,5 +115,5 @@ jobs:
       - name: Push README with new version
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.secrets.MASTER_TOKEN }}
+          github_token: ${{ secrets.MASTER_TOKEN }}
           branch: ${{ github.ref }}
