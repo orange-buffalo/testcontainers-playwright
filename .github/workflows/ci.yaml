@@ -20,19 +20,12 @@ jobs:
         distribution: 'corretto'
         java-version: '17'
 
-    - name: Build Cache
-      uses: actions/cache@v4
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
       with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-          ~/.cache/google-cloud-tools-java/jib
-        # workaround for https://github.com/actions/cache/issues/342
-        # generate new key for each build to force cache push
-        key: build-cache-${{ github.run_id }}
-        # but use restore key to restore the latest pushed cache
-        restore-keys: |
-          build-cache-
+        gradle-version: wrapper
+        # disable reading from cache on re-runs to fix possible caching issues
+        cache-write-only: ${{ fromJSON(github.run_attempt) != 1 }}
 
     - name: "Build"
       run: ./gradlew assemble publishToMavenLocal -Psigning.skip=true --scan --console=plain --build-cache
