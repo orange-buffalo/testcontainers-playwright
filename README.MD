@@ -1,6 +1,6 @@
 # Playwright Testcontainers
 
-![](https://maven-badges.herokuapp.com/maven-central/io.orange-buffalo/testcontainers-playwright/badge.svg?style=flat-square)
+[![](https://maven-badges.herokuapp.com/maven-central/io.orange-buffalo/testcontainers-playwright/badge.svg?style=flat-square)](https://search.maven.org/artifact/io.orange-buffalo/testcontainers-playwright)
 
 This library provides a [Testcontainers](https://www.testcontainers.org/)-based container for 
 [Playwright](https://playwright.dev/java/) that enables running 
