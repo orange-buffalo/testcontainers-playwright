@@ -61,7 +61,7 @@ jobs:
     - name: "Test assembly"
       run: |
         cd ./.assembly-tests
-        ./gradlew test -PtestcontainersPlaywrightVersion=${{ env.TCP_VERSION }} --build-cache
+        ./gradlew test -PtestcontainersPlaywrightVersion=${{ env.TCP_VERSION }} --build-cache --scan
 
     - name: "Publish snapshot"
       if: ${{ github.actor != 'dependabot[bot]' }}
