@@ -40,7 +40,7 @@ val shadowDependencies: Configuration by configurations.creating
 configurations["implementation"].extendsFrom(shadowDependencies)
 
 dependencies {
-    api("org.testcontainers:testcontainers:1.19.6")
+    api("org.testcontainers:testcontainers:1.19.7")
     api("com.microsoft.playwright:playwright:1.41.2")
     api("org.jetbrains.kotlin:kotlin-stdlib:1.7.22")
 
@@ -52,7 +52,7 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:5.8.0")
     testImplementation("com.microsoft.playwright:playwright:1.41.2")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
-    testImplementation("org.testcontainers:nginx:1.19.6")
+    testImplementation("org.testcontainers:nginx:1.19.7")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
