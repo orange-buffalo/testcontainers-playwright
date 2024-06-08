@@ -1,8 +1,11 @@
+# This is a default value that is overridden during a build
 ARG PLAYWRIGHT_VERSION=1.32
+# This is a default value that is overridden during a build based on Playwright version
 ARG BASE_OS=focal
 
 FROM mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}.0-${BASE_OS}
 
+# This is a default value that is overridden during a build
 ARG PLAYWRIGHT_VERSION=1.32
 
 WORKDIR /app
