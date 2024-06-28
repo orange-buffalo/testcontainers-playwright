@@ -41,7 +41,7 @@ configurations["implementation"].extendsFrom(shadowDependencies)
 
 dependencies {
     api("org.testcontainers:testcontainers:1.19.8")
-    api("com.microsoft.playwright:playwright:1.44.0")
+    api("com.microsoft.playwright:playwright:1.45.0")
     api("org.jetbrains.kotlin:kotlin-stdlib:1.7.22")
 
     shadowDependencies("io.github.microutils:kotlin-logging:3.0.5")
@@ -50,7 +50,7 @@ dependencies {
     compileOnly("org.junit.jupiter:junit-jupiter-api:5.10.3")
 
     testImplementation("io.kotest:kotest-assertions-core:5.9.1")
-    testImplementation("com.microsoft.playwright:playwright:1.44.0")
+    testImplementation("com.microsoft.playwright:playwright:1.45.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
     testImplementation("org.testcontainers:nginx:1.19.8")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
