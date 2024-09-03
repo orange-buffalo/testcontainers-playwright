@@ -101,7 +101,7 @@ jobs:
 
       - name: Create PR for post-release routines
         id: post_release_pr
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.MASTER_TOKEN }}
           commit-message: "chore: Post-release ${{ steps.calculate_new_version.outputs.new_release }}"
