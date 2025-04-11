@@ -47,13 +47,13 @@ dependencies {
     shadowDependencies("io.github.microutils:kotlin-logging:3.0.5")
     shadowDependencies("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
-    compileOnly("org.junit.jupiter:junit-jupiter-api:5.11.4")
+    compileOnly("org.junit.jupiter:junit-jupiter-api:5.12.2")
 
     testImplementation("io.kotest:kotest-assertions-core:5.9.1")
     testImplementation("com.microsoft.playwright:playwright:1.51.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.4")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
     testImplementation("org.testcontainers:nginx:1.20.6")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.4")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.4")
     testRuntimeOnly("ch.qos.logback:logback-classic:1.5.18")
