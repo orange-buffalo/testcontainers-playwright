@@ -16,6 +16,11 @@ curl -s "https://repo1.maven.org/maven2/com/microsoft/playwright/playwright/mave
              BASE_OS="jammy"
           fi
 
+          # Use noble for versions 1.51 and later
+          if printf '%s\n' "1.51" "$VERSION" | sort -V -C; then
+             BASE_OS="noble"
+          fi
+
           echo "Building $VERSION"
           docker build \
             --build-arg PLAYWRIGHT_VERSION=$VERSION \
