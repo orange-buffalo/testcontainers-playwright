@@ -20,3 +20,6 @@ updates:
         patterns:
           - "org.junit.jupiter:*"
           - "org.junit.platform:*"
+      testcontainers:
+        patterns:
+          - "org.testcontainers:*"
