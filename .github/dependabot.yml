@@ -19,3 +19,4 @@ updates:
       junit-jupiter:
         patterns:
           - "org.junit.jupiter:*"
+          - "org.junit.platform:*"
