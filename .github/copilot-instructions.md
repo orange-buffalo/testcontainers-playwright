@@ -4,6 +4,7 @@
 2. Do not provide summaries of the executed actions.
 3. Never add noisy comments or explanations to the code. Prefer self-explanatory code. Only add comments for non-trivial
    decisions where it is not clear why the code is written that way.
+4. Take your time and think about the task before starting to write code. Provide a plan of the changes.
 
 ## Tests
 

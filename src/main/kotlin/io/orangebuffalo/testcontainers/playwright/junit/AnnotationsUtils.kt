@@ -4,16 +4,37 @@ import java.lang.reflect.AnnotatedElement
 import kotlin.reflect.KClass
 
 internal fun hasAnnotation(element: AnnotatedElement, annotationClass: KClass<out Annotation>): Boolean {
-    return findAnnotation(element, annotationClass) != null
-            || findMetaAnnotation(element, annotationClass) != null
+    return when (element) {
+        is Class<*> -> getAnnotation(element, annotationClass) != null
+        else -> getAnnotationWithoutInheritance(element, annotationClass) != null
+    }
 }
 
-internal fun <A : Annotation> getAnnotation(element: AnnotatedElement, annotationClass: KClass<out A>): A? {
-    return findAnnotation(element, annotationClass)
-        ?: findMetaAnnotation(element, annotationClass)
+internal fun <A : Annotation> getAnnotation(element: Class<*>, annotationClass: KClass<out A>): A? {
+    var current: Class<*>? = element
+    while (current != null) {
+        val direct = getDirectAnnotation(current, annotationClass)
+        if (direct != null) return direct
+        val meta = findMetaAnnotation(current, annotationClass)
+        if (meta != null) return meta
+
+        current.interfaces.forEach { iface ->
+            val result = getAnnotation(iface, annotationClass)
+            if (result != null) return result
+        }
+
+        current = current.superclass
+    }
+    return null
 }
 
-private fun <A : Annotation> findAnnotation(element: AnnotatedElement, annotationClass: KClass<out A>): A? {
+private fun <A : Annotation> getAnnotationWithoutInheritance(element: AnnotatedElement, annotationClass: KClass<out A>): A? {
+    val direct = getDirectAnnotation(element, annotationClass)
+    if (direct != null) return direct
+    return findMetaAnnotation(element, annotationClass)
+}
+
+private fun <A : Annotation> getDirectAnnotation(element: AnnotatedElement, annotationClass: KClass<out A>): A? {
     return element.getAnnotation(annotationClass.java)
 }
 
