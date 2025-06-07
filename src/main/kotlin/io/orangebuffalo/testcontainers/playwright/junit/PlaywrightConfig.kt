@@ -23,9 +23,11 @@ annotation class PlaywrightConfig(
 interface PlaywrightConfigurer {
 
     /**
-     * Creates a container that will be used to start Playwright. Main purpose is to either use
-     * custom image, or even custom implementation. Might be useful in the future, when we add support
-     * for other browsers.
+     * Creates or provides a container that will be used to start Playwright. Examples of usage include:
+     * - using a custom image
+     * - providing fully custom implementation
+     * - returning a singleton instance when [Singleton Containers](https://testcontainers.com/guides/testcontainers-container-lifecycle/#_using_singleton_containers)
+     * pattern is used
      */
     fun createContainer(): PlaywrightContainer = PlaywrightContainer()
 
