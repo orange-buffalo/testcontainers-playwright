@@ -5,6 +5,7 @@ import com.microsoft.playwright.Page
 import io.orangebuffalo.testcontainers.playwright.PlaywrightContainer
 import io.orangebuffalo.testcontainers.playwright.PlaywrightApi
 import org.junit.jupiter.api.extension.*
+import org.junit.platform.commons.support.AnnotationSupport
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
 
@@ -100,9 +101,9 @@ class PlaywrightExtension : Extension, ParameterResolver, AfterEachCallback {
         extensionContext: ExtensionContext,
         annotationClass: KClass<out Annotation>
     ): Boolean {
-        return hasAnnotation(parameterContext.parameter, annotationClass)
-                || hasAnnotation(extensionContext.requiredTestMethod, annotationClass)
-                || hasAnnotation(extensionContext.requiredTestClass, annotationClass)
+        return AnnotationSupport.isAnnotated(parameterContext.parameter, annotationClass.java)
+                || AnnotationSupport.isAnnotated(extensionContext.requiredTestMethod, annotationClass.java)
+                || AnnotationSupport.isAnnotated(extensionContext.requiredTestClass, annotationClass.java)
     }
 
     override fun afterEach(context: ExtensionContext) {
@@ -146,7 +147,9 @@ class PlaywrightExtension : Extension, ParameterResolver, AfterEachCallback {
     }
 }
 
-private fun ExtensionContext.getConfig() = getAnnotation(requiredTestClass, PlaywrightConfig::class)
+private fun ExtensionContext.getConfig() : PlaywrightConfig? = AnnotationSupport
+    .findAnnotation(requiredTestClass, PlaywrightConfig::class.java)
+    .orElse(null)
 
 private val PlaywrightConfig?.containerStorageKey: String
     get() = this?.configurer?.qualifiedName ?: "default"
