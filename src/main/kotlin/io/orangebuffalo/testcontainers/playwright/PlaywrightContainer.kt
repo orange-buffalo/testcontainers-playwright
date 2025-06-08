@@ -11,7 +11,6 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
-private val log = mu.KotlinLogging.logger {}
 private const val apiPort = 3000
 private const val chromiumPort = 4444
 private const val firefoxPort = 4445
@@ -67,7 +66,7 @@ class PlaywrightContainer(private val customImage: DockerImageName? = null) :
         withCopyToContainer(MountableFile.forClasspathResource("playwright-server.js"), "/app/playwright-server.js")
 
         if (customImage == null) {
-            log.info { "Will use Playwright image $playwrightVersionCompatibleTag for version $playwrightVersion found on classpath" }
+            log.debug { "Will use Playwright image $playwrightVersionCompatibleTag for version $playwrightVersion found on classpath" }
             super.setDockerImageName("ghcr.io/orange-buffalo/testcontainers-playwright:$playwrightVersionCompatibleTag")
         }
 

@@ -4,12 +4,12 @@ import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Page
 import io.orangebuffalo.testcontainers.playwright.PlaywrightContainer
 import io.orangebuffalo.testcontainers.playwright.PlaywrightApi
+import io.orangebuffalo.testcontainers.playwright.log
 import org.junit.jupiter.api.extension.*
 import org.junit.platform.commons.support.AnnotationSupport
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
 
-private val log = mu.KotlinLogging.logger {}
 private var containers = ConcurrentHashMap<String?, PlaywrightContainer>()
 private val extensionNamespace = ExtensionContext.Namespace.create("io.orangebuffalo.testcontainers.playwright")
 private const val BROWSER_CONTEXTS_KEY = "browserContexts"
@@ -130,7 +130,7 @@ class PlaywrightExtension : Extension, ParameterResolver, AfterEachCallback {
         }
 
         val container = containers.computeIfAbsent(config.containerStorageKey) { configKey ->
-            log.info { "Starting Playwright container for $configKey config" }
+            log.debug { "Starting Playwright container for $configKey config" }
 
             val container = configurer?.createContainer() ?: PlaywrightContainer()
             container
@@ -140,14 +140,14 @@ class PlaywrightExtension : Extension, ParameterResolver, AfterEachCallback {
                 .also {
                     configurer?.setupContainer(it)
                     it.start()
-                    log.info { "Playwright container started" }
+                    log.debug { "Playwright container started" }
                 }
         }
         return container.getPlaywrightApi()
     }
 }
 
-private fun ExtensionContext.getConfig() : PlaywrightConfig? = AnnotationSupport
+private fun ExtensionContext.getConfig(): PlaywrightConfig? = AnnotationSupport
     .findAnnotation(requiredTestClass, PlaywrightConfig::class.java)
     .orElse(null)
 
@@ -156,4 +156,11 @@ private val PlaywrightConfig?.containerStorageKey: String
 
 private fun PlaywrightConfig?.instantiateConfigurer(): PlaywrightConfigurer? {
     return this?.configurer?.java?.getDeclaredConstructor()?.newInstance()
+        .also {
+            if (it == null) {
+                log.debug { "No configurer discovered, using defaults" }
+            } else {
+                log.debug { "Using ${it.javaClass} to configure Playwright" }
+            }
+        }
 }
