@@ -3,6 +3,7 @@ package io.orangebuffalo.testcontainers.playwright.junit
 import com.microsoft.playwright.Browser.NewContextOptions
 import com.microsoft.playwright.BrowserContext
 import io.orangebuffalo.testcontainers.playwright.PlaywrightContainer
+import java.lang.annotation.Inherited
 import kotlin.reflect.KClass
 
 /**
@@ -10,6 +11,7 @@ import kotlin.reflect.KClass
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
+@Inherited
 annotation class PlaywrightConfig(
     /**
      * Configurer class that will be used to configure [PlaywrightExtension].

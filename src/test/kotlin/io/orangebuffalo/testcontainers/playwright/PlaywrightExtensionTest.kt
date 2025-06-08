@@ -504,6 +504,25 @@ internal class PlaywrightExtensionTest {
         }
     }
 
+    @ExtendWith(PlaywrightExtension::class)
+    @PlaywrightConfig(TestExtensionsConfigurer::class)
+    abstract class BaseTestClass
+
+    @Nested
+    @DisplayName("should allow to configure playwright in base test class")
+    inner class PlaywrightConfiguredInBaseTestClass : BaseTestClass() {
+
+        @Test
+        fun `for browser context`(browserContext: BrowserContext) = executeTest(browserContext.newPage())
+
+        @Test
+        fun `for page`(page: Page) = executeTest(page)
+
+        private fun executeTest(page: Page) {
+            page.navigateAndVerify()
+        }
+    }
+
     class BrowserContextSetupConfigurer : TestExtensionsConfigurer() {
         override fun setupBrowserContext(context: BrowserContext) {
             context.setDefaultTimeout(20.0)
