@@ -4,7 +4,7 @@ import com.microsoft.playwright.Browser
 import com.microsoft.playwright.Playwright
 import java.util.jar.Manifest
 
-private val log = mu.KotlinLogging.logger {}
+internal val log = mu.KotlinLogging.logger("io.orangebuffalo.testcontainers.playwright")
 
 internal fun getPlaywrightVersionOnClasspath(): String? {
     val playwrightVersions = mutableSetOf<String>()
