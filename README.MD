@@ -6,8 +6,32 @@ This library provides a [Testcontainers](https://www.testcontainers.org/)-based 
 [Playwright](https://playwright.dev/java/) that enables running 
 browser automation and testing without installing Playwright browsers locally.
 
+> [!IMPORTANT]  
+> This library has a limited value. In most cases, brilliant [Playwright JUnit support](https://playwright.dev/java/docs/junit)
+> is all you need for running Playwright tests locally and on CI. 
+> However, there are some cases when using Docker has advantages:
+> * Rendering tests (aka screenshot tests). In most cases, rendering the same page on different OSes
+> will produce different results. Using Playwright in a Docker container allows you to run tests on the same OS
+> as your CI, which is usually Linux.
+> 
+>   Still, the value of such tests is questionable. Our open-source and commercial experience shows that
+>   generally maintenance costs are too high for the benefit they provide.
+> 
+> * Security/compliance requirements, where downloading from external sources is restricted.
+> Limiting the sources to a managed Docker registry could be a solution.
+> 
+>   Likely, [proxying/hosting Playwright browsers](https://playwright.dev/java/docs/browsers#download-from-artifact-repository)
+>   is a better alternative for such cases.
+> 
+> 
+> If you have other use cases that require running Playwright in a Docker container,
+> please let us know via a [discussion](https://github.com/orange-buffalo/testcontainers-playwright/discussions)
+> in the repository.
 
-It offers a low-level API to directly work with the container and a high-level API via JUnit 5 
+
+
+
+The library offers a low-level API to directly work with the container and a high-level API via JUnit 5 
 extension for seamless integration with your tests.
 
 - [Key Features](#key-features)
@@ -259,9 +283,9 @@ of the available API and configuration options.
 
 ## Troubleshooting
 
-1. If something works not as expected, try enabling debug logging for `io.orangebuffalo.testcontainers.playwright`
+1. If something does not work as expected, try enabling debug logging for `io.orangebuffalo.testcontainers.playwright`
   category (this requires Slf4j to be configured in your project). 
-   This will provide some details about the discovery and execution process. Please attach the logs to your issue if you need help.
+   It will provide some details about the discovery and execution process. Please attach the logs to your issue if you need help.
 
 ## Contributing
 
