@@ -28,9 +28,6 @@ browser automation and testing without installing Playwright browsers locally.
 > please let us know via a [discussion](https://github.com/orange-buffalo/testcontainers-playwright/discussions)
 > in the repository.
 
-
-
-
 The library offers a low-level API to directly work with the container and a high-level API via JUnit 5 
 extension for seamless integration with your tests.
 
@@ -44,6 +41,8 @@ extension for seamless integration with your tests.
     - [Injecting Primitives](#injecting-primitives)
     - [Configuring the Extension](#configuring-the-extension)
     - [Local Development Experience](#local-development-experience)
+  - [Troubleshooting](#troubleshooting)
+  - [Contributing](#contributing)
 
 ## Key Features
 
