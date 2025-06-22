@@ -35,7 +35,7 @@ jobs:
 
     - name: "Extract current version"
       run: |
-        TCP_VERSION=$(./gradlew -q version)
+        TCP_VERSION=$(./gradlew -q printVersion)
         echo "TCP_VERSION=$TCP_VERSION" >> "$GITHUB_ENV"
 
     - name: Select assembly tests repo branch
