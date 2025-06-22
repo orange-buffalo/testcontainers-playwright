@@ -79,7 +79,7 @@ jobs:
         require_tests: false
 
     - name: "Publish (Pre-) Release"
-      if: ${{ github.ref == 'refs/heads/main' }}
+      if: ${{ github.ref == 'refs/heads/master' }}
       env:
         JRELEASER_CONFIG_CONTENT: ${{ secrets.JRELEASER_CONFIG_CONTENT }}
       run: |
