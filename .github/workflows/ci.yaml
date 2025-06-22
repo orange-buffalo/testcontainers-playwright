@@ -63,15 +63,6 @@ jobs:
         cd ./.assembly-tests
         ./gradlew test -PtestcontainersPlaywrightVersion=${{ env.TCP_VERSION }} --build-cache --scan
 
-    - name: "Publish snapshot"
-      if: ${{ github.actor != 'dependabot[bot]' }}
-      run: ./gradlew publish --scan --console=plain --build-cache
-      env:
-        ORG_GRADLE_PROJECT_ossrhSigningKey: "${{ secrets.ossrhSigningKey }}"
-        ORG_GRADLE_PROJECT_ossrhSigningPassword: "${{ secrets.ossrhSigningPassword }}"
-        ORG_GRADLE_PROJECT_ossrhPassword: "${{ secrets.ossrhPassword }}"
-        ORG_GRADLE_PROJECT_ossrhUser: "${{ secrets.ossrhUser }}"
-
     - name: "Save Tests Results"
       uses: actions/upload-artifact@v4
       if: ${{ failure() }}
@@ -79,3 +70,19 @@ jobs:
         name: Tests Results
         path: "**/build/reports/tests/**/"
         if-no-files-found: "ignore"
+
+    - name: "Publish Test Report"
+      uses: mikepenz/action-junit-report@v5
+      if: ${{ failure() }}
+      with:
+        report_paths: "**/build/test-results/**/TEST-*.xml"
+        require_tests: false
+
+    - name: "Publish (Pre-) Release"
+      if: ${{ github.ref == 'refs/heads/main' }}
+      env:
+        JRELEASER_CONFIG_CONTENT: ${{ secrets.JRELEASER_CONFIG_CONTENT }}
+      run: |
+        mkdir -p ~/.jreleaser
+        echo "$JRELEASER_CONFIG_CONTENT" > ~/.jreleaser/config.toml
+        ./gradlew publish jreleaserFullRelease --scan --console=plain --build-cache

@@ -15,6 +15,8 @@ updates:
     ignore:
       - dependency-name: "org.jetbrains.kotlinx:kotlinx-serialization-json"
       - dependency-name: "org.jetbrains.kotlin:kotlin-stdlib"
+      # until JReleaser migrates to JGit 7x
+      - dependency-name: "com.github.jmongard.git-semver-plugin"
     groups:
       junit-jupiter:
         patterns:

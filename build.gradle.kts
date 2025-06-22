@@ -1,34 +1,24 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jreleaser.model.Active
 
 plugins {
     kotlin("jvm") version "1.7.22"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.22"
-    id("me.qoomon.git-versioning") version "6.4.4"
     id("org.jetbrains.dokka") version "2.0.0"
-    `maven-publish`
-    signing
-    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    // version pinned as newer has major JGit changed which is not compatible with jreleaser
+    id("com.github.jmongard.git-semver-plugin") version "0.13.0"
+    id("maven-publish")
+    id("signing")
+    id("org.jreleaser") version "1.18.0"
 }
 
 group = "io.orange-buffalo"
-version = "0.0.0-SNAPSHOT"
-gitVersioning.apply {
-    refs {
-        branch("master") {
-            version = "\${describe.tag.version}-SNAPSHOT"
-        }
-        branch(".+") {
-            version = "\${ref}-SNAPSHOT"
-        }
-        tag("v(?<version>.*)") {
-            version = "\${ref.version}"
-        }
-    }
-    rev {
-        version = "\${commit}"
-    }
+semver {
+    // tags managed by jreleaser
+    createReleaseTag = false
 }
+version = semver.version
 
 repositories {
     mavenCentral()
@@ -166,28 +156,59 @@ publishing {
     }
 }
 
-nexusPublishing {
-    this.repositories {
-        sonatype {
-            val ossrhUser: String? by project
-            val ossrhPassword: String? by project
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots"))
-            username.set(ossrhUser)
-            password.set(ossrhPassword)
+jreleaser {
+    release {
+        github {
+            val shouldSkipGitHubActions = project.version.get().endsWith("-SNAPSHOT")
+            skipTag = shouldSkipGitHubActions
+            skipRelease = shouldSkipGitHubActions
+
+            uploadAssets = Active.NEVER
+            prerelease {
+                enabled = true
+            }
+            changelog {
+                formatted = Active.ALWAYS
+                preset = "conventional-commits"
+                skipMergeCommits = true
+                hide {
+                    uncategorized = true
+                    contributor("[bot]")
+                    contributor("orange-buffalo")
+                    contributor("GitHub")
+                }
+            }
         }
     }
-}
-
-signing {
-    // provide this property (-Psigning.skip=true) to disable signing and deploy snapshots into local repo
-    setRequired({
-        !project.hasProperty("signing.skip")
-    })
-    val ossrhSigningKey: String? by project
-    val ossrhSigningPassword: String? by project
-    useInMemoryPgpKeys(ossrhSigningKey, ossrhSigningPassword)
-    sign(publishing.publications["maven"])
+    signing {
+        active = Active.ALWAYS
+        armored = true
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                create("release-deploy") {
+                    active = Active.RELEASE
+                    url = "https://central.sonatype.com/api/v1/publisher"
+                    stagingRepository("build/staging-deploy")
+                    javadocJar = false
+                }
+            }
+            nexus2 {
+                create("snapshot-deploy") {
+                    active = Active.SNAPSHOT
+                    url = "https://central.sonatype.com/repository/maven-snapshots/"
+                    snapshotUrl = "https://central.sonatype.com/repository/maven-snapshots/"
+                    applyMavenCentralRules = true
+                    snapshotSupported = true
+                    closeRepository = true
+                    releaseRepository = true
+                    stagingRepository("build/staging-deploy")
+                    javadocJar = false
+                }
+            }
+        }
+    }
 }
 
 gradleEnterprise {

@@ -87,13 +87,16 @@ Maven:
     <groupId>io.orange-buffalo</groupId>
     <artifactId>testcontainers-playwright</artifactId>
     <scope>test</scope>
-    <version>0.12.0</version>
+    <version>${testcontainers-playwright.version}</version>
 </dependency>
 ```
 Gradle:
 ```kotlin
-testImplementation("io.orange-buffalo:testcontainers-playwright:0.12.0")
+testImplementation("io.orange-buffalo:testcontainers-playwright:${testcontainersPlaywrightVersion}")
 ```
+
+Refer to the [Maven Central](https://search.maven.org/artifact/io.orange-buffalo/testcontainers-playwright)
+for the latest version.
 
 Then, you can create a `PlaywrightContainer` instance and use the provided API to access the browser instances.
 
