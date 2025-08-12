@@ -10,7 +10,7 @@ jobs:
     steps:
 
     - name: "Checkout"
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 
@@ -51,7 +51,7 @@ jobs:
         fi
 
     - name: Checkout assembly tests repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: orange-buffalo/testcontainers-playwright-assembly-tests
         ref: ${{ env.ASSEMBLY_TESTS_BRANCH }}
