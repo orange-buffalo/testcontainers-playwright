@@ -64,7 +64,7 @@ jobs:
         ./gradlew test -PtestcontainersPlaywrightVersion=${{ env.TCP_VERSION }} --build-cache --scan
 
     - name: "Save Tests Results"
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: ${{ failure() }}
       with:
         name: Tests Results
