@@ -2,8 +2,8 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jreleaser.model.Active
 
 plugins {
-    kotlin("jvm") version "1.7.22"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.22"
+    kotlin("jvm") version "2.2.0"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0"
     id("org.jetbrains.dokka") version "2.0.0"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     // version pinned as newer has major JGit changed which is not compatible with jreleaser
@@ -32,7 +32,7 @@ configurations["implementation"].extendsFrom(shadowDependencies)
 dependencies {
     api("org.testcontainers:testcontainers:1.21.3")
     api("com.microsoft.playwright:playwright:1.56.0")
-    api("org.jetbrains.kotlin:kotlin-stdlib:1.7.22")
+    api("org.jetbrains.kotlin:kotlin-stdlib:2.2.0")
 
     shadowDependencies("io.github.microutils:kotlin-logging:3.0.5")
     shadowDependencies("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
