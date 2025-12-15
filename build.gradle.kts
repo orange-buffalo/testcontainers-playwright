@@ -37,16 +37,16 @@ dependencies {
     shadowDependencies("io.github.microutils:kotlin-logging:3.0.5")
     shadowDependencies("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
-    compileOnly("org.junit.jupiter:junit-jupiter-api:5.13.4")
+    compileOnly("org.junit.jupiter:junit-jupiter-api:6.0.1")
 
     testImplementation("io.kotest:kotest-assertions-core:5.9.1")
     testImplementation("com.microsoft.playwright:playwright:1.56.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.4")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:6.0.1")
     testImplementation("org.testcontainers:nginx:1.21.3")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.4")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:6.0.1")
 
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.4")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.13.4")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:6.0.1")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:6.0.1")
     testRuntimeOnly("ch.qos.logback:logback-classic:1.5.18")
 }
 
